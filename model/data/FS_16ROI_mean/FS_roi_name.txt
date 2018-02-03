@@ -1,0 +1,16 @@
+lh_central	CG.L
+lh_planum_polare	PP.L
+lh_planum_temporale	PT.L
+lh_postcentral	PoCG.L
+lh_precentral	PreCG.L
+lh_superior_temporal_gyrus	STG.L
+lh_transverse_temporal_gyrus	TTG.L
+lh_transverse_temporal_sulcus	TTS.L
+rh_central	CG.R
+rh_planum_polare	PP.R
+rh_planum_temporale	PT.R
+rh_postcentral	PoCG.R
+rh_precentral	PreCG.R
+rh_superior_temporal_gyrus	STG.R
+rh_transverse_temporal_gyrus	TTG.R
+rh_transverse_temporal_sulcus	TTS.R

@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>kMindConnect</title>
+    <link rel="stylesheet" type="text/css" href="./css/iview.css">
+    <!--
+        <script src="./js/vue.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+    -->
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/markdown-it/8.4.0/markdown-it.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.8.3/katex.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.8.3/katex.min.js"></script>
+    <script src="./js/markdown-it-katex.js"></script>
+
+    <script src="https://unpkg.com/lodash@4.16.0"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue-router/3.0.1/vue-router.js"></script>
+    <script src="./js/vue.js"></script>
+    
+    <script src="./js/vue-custom-element.js"></script>
+    <script src="./js/iview.js"></script>
+    <!--
+        <script src="https://unpkg.com/iview@2.9.0/dist/iview.min.js"></script>
+    -->
+    <script src="./js/iview-locale/en-US.js"></script>
+    
+    <link rel="stylesheet" type="text/css" href="./css/app.css">
+    <link rel="stylesheet" type="text/css" href="./css/cupertino-theme.css">
+    <link rel="stylesheet" type="text/css" href="./css/markdown.css">
+    <script src="./js/boot.js"></script>
+    
+    <link rel="import" href="./components/main_layout.vue">
+    <link rel="import" href="./components/markdown_element.vue">
+    <link rel="import" href="./components/file_input.vue">
+
+    <link rel="import" href="./components/left_sidebar.vue">
+    <link rel="import" href="./components/main_svar_single_settings.vue">
+    <link rel="import" href="./components/main_svar_single_results.vue">
+    <link rel="import" href="./components/main_svar_batch_settings.vue">
+    <link rel="import" href="./components/main_svar_batch_results.vue">
+    <link rel="import" href="./components/main_svar_settings.vue">
+
+    <link rel="import" href="./components/main_svar_data_doc.vue">
+    <link rel="import" href="./components/main_svar_model_doc.vue">
+</head>
+
+<body>
+    <div id="app">
+        <!--
+        <i-button @click="show">
+        Click hgggme!</i-button>
+        <Modal v-model="visible" title="Welcome">Welcome to iView</Modal>
+        -->
+        <app-layout>
+            <app-left-sidebar slot="left-side-bar"></app-left-sidebar>
+<!--
+<router-link to="/svar/documentation">Documentation</router-link>
+<router-link to="/svar/single/settings">Sett</router-link>
+<router-link to="/foo">Go to Foo</router-link>
+<router-link to="/bar">Go to Bar</router-link>
+<i-button @click="show">
+    Click me!</i-button>
+<Modal v-model="visible" title="Welcome">Welcome to iView</Modal>
+-->
+                <router-view></router-view>
+            <!--
+
+            sss
+            <i-button @click="show">Click me!</i-button>
+            <Modal v-model="visible" title="Welcome">Welcome to iView</Modal>
+            s
+            <markdown-element>
+                # Documentation
+                ## Blah!
+                ### Blah!
+
+
+                Esse é outro Documentation!
+                $x^2$
+
+
+                ![https://image.slidesharecdn.com/vuejspresentation-170120140736/95/vuejs-for-angular-developers-26-638.jpg?cb=1484921395](https://image.slidesharecdn.com/vuejspresentation-170120140736/95/vuejs-for-angular-developers-26-638.jpg?cb=1484921395)
+            </markdown-element>
+            -->
+        </app-layout>
+
+    </div>
+    <template id="foo">
+        <div>
+            aaa
+        </div>
+    </template>
+
+    <template id="bar">
+        <markdown-element>
+            # Documentation ## Blah! ### Blah! Esse é outro Documentation! $x^2$ ![https://image.slidesharecdn.com/vuejspresentation-170120140736/95/vuejs-for-angular-developers-26-638.jpg?cb=1484921395](https://image.slidesharecdn.com/vuejspresentation-170120140736/95/vuejs-for-angular-developers-26-638.jpg?cb=1484921395)
+        </markdown-element>
+    </template>
+
+    <template id="assss">
+        <div>
+        <app-svar-settings >
+
+        </app-svar-settings>
+        </div>
+    </template>
+
+    <script>
+        function callAJAX(url, methodType) {
+            methodType = methodType || "GET";
+            var promiseObj = new Promise(function (resolve, reject) {
+                var xhr = new XMLHttpRequest();
+                xhr.open(methodType, url, true);
+                xhr.send();
+                xhr.onreadystatechange = function () {
+                    if (xhr.readyState === 4) {
+                        if (xhr.status === 200) {
+                            //console.log("xhr done successfully");
+                            var resp = xhr.responseText;
+                            var respJson = JSON.parse(resp);
+                            resolve(respJson);
+                        } else {
+                            reject(xhr.status);
+                            //console.log("xhr failed");
+                        }
+                    } else {
+                        //console.log("xhr processing going on");
+                    }
+                }
+                //console.log("request sent succesfully");
+            });
+            return promiseObj;
+        }
+
+        
+        function deleteFolderRecursive(path) {
+            const electron = require("electron").remote
+            var fs = electron.require('fs');
+            if (fs.existsSync(path)) {
+                fs.readdirSync(path).forEach(function (file, index) {
+                    var curPath = path + "/" + file;
+                    if (fs.lstatSync(curPath).isDirectory()) { // recurse
+                        deleteFolderRecursive(curPath);
+                    } else { // delete file
+                        fs.unlinkSync(curPath);
+                    }
+                });
+                fs.rmdirSync(path);
+            }
+        };
+
+        function executeCommand(commandName, args, event){
+            let runBrowser = event.runBrowser || (() => { });
+            let runStandalone = event.runStandalone || (() => { });
+            let finish = event.finish || (() => { });
+            let error = event.error || (() => { });
+            //let stdin = event.stdin || (() => { });
+            let stdout = event.stdout || (() => { });
+            let stderr = event.stderr || (() => { });
+            try {
+                const electron = require("electron").remote
+                try {
+                    const process = electron.require('child_process');
+                    var ls = process.spawn(commandName, args, {}, (error, stdout, stderr) => {
+                        if (error) {
+                            throw error;
+                        }
+                        console.log(stdout);
+                    }).on('close', function (code) {
+                        finish(code)
+                    }).on('error', function (err) {
+                        err(err)
+                    }).on('uncaughtException', function (err) {
+                        err(err)
+                    });
+                    ls.stdout.on('data', function (data) {
+                        stdout(data)
+                    });
+                    ls.stderr.on('data', function (data) {
+                        stderr(data)
+                    });
+                } catch (err) {
+                    error(err);
+                }
+            } catch (e) {
+                runBrowser()
+                finish(-1)
+            }
+        }
+        
+        class ApplicationEnvironment{
+            constructor(){
+                this.settings = null;
+                this.basepath = null;
+                this.getApplicationPath()
+                this.loadConfiguration();
+            }
+            getDefaultConfig(){
+                return {
+                    pythonPath: "python",
+                    matlabPath: "matlab",
+                }
+            }
+            getApplicationPath(){
+                try {
+                    const remote = require('remote');
+                    const app = remote.require('app');
+                    this.basepath = app.getAppPath();
+                } catch (error) {
+                    this.basepath = "./"
+                }
+            }
+            loadConfiguration(){
+                const self = this;
+                if(!this.settings){
+                    callAJAX("./configuration.json").then((data) => {
+                        console.log("111")
+                        self.settings = data
+                    }, () => {
+                        console.log("1113")
+                        self.settings = self.getDefaultConfig()
+                    })
+                }
+            }
+            get pythonPath(){ return this.settings.pythonPath; }
+        }
+        
+        const Foo = { name:'foo', template: '#foo' }
+        const Bar = { name:'bar', template: '#bar' }
+        const router = new VueRouter({
+            routes: [
+                { path: '/foo', component: Foo },
+                { path: '/svar/data/documentati3on', component: {name: "aa", template: "#assss", 
+                        methods: {
+                            show: function () {
+                                this.visible = true;
+                                console.log("aaaa")
+                            },
+                            simulationStart: function (type, parameters) {
+                                console.log(type, parameters)
+                            },
+                }}},
+                { path: '/svar/data/documentation', component: ApplicationSVARDataDocumentation},
+                { path: '/svar/model/documentation', component: ApplicationSVARModelDocumentation },
+                { path: '/svar/single/settings', component: ApplicationSVARSingleSettings },
+                { path: '/svar/single/results', component: ApplicationSVARSingleResults },
+                { path: '/svar/batch/settings', component: ApplicationSVARBatchSettings },
+                { path: '/svar/batch/results', component: ApplicationSVARBatchResults },
+            ]
+        })
+
+        Vue.use(VueRouter)
+        var app = new Vue({
+            el: '#app',
+            data: {
+                visible: false,
+            },
+            created: function () {
+                this.$on('execution-start', this.simulationStart);
+            },
+            methods: {
+                show: function () {
+                    this.visible = true;
+                    console.log("aaaa")
+                },
+                simulationStart: function (sender, type, parameters) {
+                    console.log(type, parameters)
+                    executeCommand(
+                        "pyth1on", 
+                        ["-m", "this"],
+                        {
+                            stdout(data) {
+                                console.log('stdout: <' + data + '> \n');
+                            },
+                            stderr(data) {
+                                console.log('stdout: <' + data + '> \n');
+                            },
+                            finish(code) {
+                                console.log('finishing: <' + code + '> \n');
+                                sender.$emit('execution-finished', 'OK', { message: `Exit code: ${code}` })
+                            },
+                            runBrowser(data) {
+                                console.log('browser: <' + data + '> \n');
+                                sender.$emit('execution-finished', 'FAILED', { message: 'This function is disable on Browser-testing.' })
+                                
+                            },
+                            runStandalone(data) {
+                                console.log('app: <' + data + '> \n');
+                            },
+                            error(data) {
+                                console.log('error: <' + data + '> \n');
+                            },
+                        }
+                    )
+                    /*
+
+                    try{
+                        const electron = require("electron").remote
+                        try{
+                            const process = electron.require('child_process');   // The power of Node.JS
+
+                            var ls = process.spawn('python', ['-V']);
+                            //
+
+                            //var ls = process.spawn('ps', ['-A']);
+                            //var ls = process.spawn('python -V');
+                            ls.stdout.on('data', function (data) {
+                                console.log('stdout: <' + data + '> \n');
+                            });
+
+                            ls.stderr.on('data', function (data) {
+                                console.log('stderr: ' + data);
+                            });
+
+                            ls.on('close', function (code) {
+                                // console.log('child process exited with code ' + code);
+                                if (code == 0){
+                                    console.log('child process complete.');
+                                    sender.$emit('execution-finished', 'OK')
+                                }else{
+                                    console.log('child process exited with code ' + code);
+                                    sender.$emit('execution-finished', 'FAILED', { message: `Exit code: ${code}` })
+                                }
+                            });
+
+
+                        }catch(error){
+                            console.log("ERROR", error)
+                            sender.$emit('execution-finished', 'FAILED', { message: `Exit code: ${error}` })
+                        }
+
+                    }catch(e){
+                        setTimeout(() => {
+                        sender.$emit('execution-finished', 'FAILED', { message: 'This function is disable on Browser-testing.' })
+                        }, 1000);
+                    }
+                    */
+                },
+                simulationUpdate() {
+                    //
+                },
+                simulationFinish() {
+                    //
+                }
+            },
+            router: router,
+            //i18n: 
+        })
+
+        document.addEventListener("keydown", function (e) {
+            if (e.which === 123) {
+                require('remote').getCurrentWindow().toggleDevTools();
+            } else if (e.which === 116) {
+                location.reload();
+            }
+        });
+    </script>
+</body>
+
+</html>

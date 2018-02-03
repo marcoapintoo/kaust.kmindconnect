@@ -1,0 +1,58 @@
+{
+  "name": "kmindconnect",
+  "version": "0.6.0",
+  "description": "Brain Connectivity Analysis",
+  "main": "./index.js",
+  "scripts": {
+    "start": "electron index.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder"
+  },
+  "author": "Marco Pinto-Orellana",
+  "license": "MIT/GPL",
+  "devDependencies": {},
+  "build": {
+    "icon": "static/images/icon.png",
+    "appId": "tonitruum.kmindconnect",
+    "electronVersion": "1.8.2-beta.5",
+    "files": [
+      {
+        "from": "./",
+        "to": "./"
+      },
+      {
+        "from": "./",
+        "to": "./",
+        "filter": [
+          "**/*.vue"
+        ]
+      }
+    ],
+    "extraResources": [
+      {
+        "from": "../model/",
+        "to": "./model/",
+        "filter": [
+          "**/*"
+        ]
+      }
+    ],
+    "extraFiles": [
+      {
+        "from": "../model/",
+        "to": "./model/",
+        "filter": [
+          "**/*"
+        ]
+      }
+    ],
+    "mac": {
+      "category": "tonitruum.kmindconnect"
+    },
+    "win": {
+      "target": "portable"
+    }
+  },
+  "postinstall": "electron-builder install-app-deps"
+}

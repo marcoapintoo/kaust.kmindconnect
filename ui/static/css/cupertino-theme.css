@@ -1,0 +1,664 @@
+*{
+    font-family: system,
+    -apple-system,
+    ".SFNSDisplay-Regular",
+    "Segoe UI",
+    "Ubuntu",
+    "Helvetica Neue",
+    Helvetica,
+    sans-serif;
+}
+
+:root{
+    --dark: 0, 0, 0;
+    --dark-gray: 102, 102, 102;
+    --light-gray: 40, 40, 40;
+    --light-H-gray: 51, 153, 255;
+    --light-G-gray: 204, 204, 204;
+    --light-F-gray: 73, 80, 96;
+    --light-E-gray: 239, 239, 239;
+    --light-D-gray: 255, 255, 255;
+    --light-C-gray: 221, 222, 225;
+    --light-B-gray: 187, 187, 187;
+    --light-A-gray: 220, 223, 225;
+    --light-1-gray: 231, 229, 231;
+    --light-2-gray: 209, 207, 209;
+    --light-3-gray: 245, 247, 249;
+    --light-blue-gray: 91, 98, 112;
+
+    --light-X-gray: 221, 221, 221;
+    --light-Y-gray: 234, 234, 234;
+}
+/*
+#app * {
+    font-size: 13px;
+}
+*/
+
+#app .ivu-form *,
+#app .ivu-menu *,
+#app {
+    font-size: 13px;
+}
+#app .dark-background {
+    background-image: linear-gradient(to bottom, rgba(var(--light-1-gray), 0.85) 10%, rgba(var(--light-2-gray), 0.85) 100%);
+    background-image: linear-gradient(to bottom, rgba(var(--light-1-gray), 1) 10%, rgba(var(--light-2-gray), 1) 100%);
+    color: rgba(var(--dark-gray), 1);
+}
+
+#app .degrade-background {
+    background-image: linear-gradient(to bottom, rgba(var(--light-X-gray), 1) 10%, rgba(var(--light-Y-gray), 1) 100%);
+    color: rgba(var(--dark-gray), 1);
+}
+
+#app * > .block-screen{
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 100;
+}
+
+#app *>.block-screen.enabled {
+    background-image: linear-gradient(to bottom, rgba(var(--light-3-gray), 0.5) 10%, rgba(var(--light-3-gray), 0.3) 70%);
+    display: block;
+    transition: background-image .3s ease .3s;
+}
+
+#app *>.block-screen.disabled {
+    background: transparent;
+    display: none;
+    transition: background-image .3s ease .3s;
+}
+
+.ivu-modal{
+    word-wrap:break-word;
+}
+
+#app .app-layout {
+    border: none;
+    background: rgba(var(--light-3-gray), 1);
+    border-radius: 0;
+    overflow: hidden;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+
+#app .app-layout .ivu-layout {
+    height: 100%;
+}
+
+#app .app-layout-logo {
+    width: 100px;
+    height: 30px;
+    background: rgba(var(--light-blue-gray), 1);
+    border-radius: 3px;
+    float: left;
+    position: relative;
+    top: 15px;
+    left: 20px;
+}
+
+#app .app-layout-nav {
+    width: 420px;
+    margin: 0 auto;
+    margin-right: 20px;
+}
+
+#app .app-layout .ivu-layout-sider {
+    background-color: rgba(var(--light-3-gray), 1);
+}
+
+#app .app-layout .ivu-menu {
+    background-color: transparent;
+    width: 100% !important;
+}
+
+#app .app-sidebar .ivu-menu-item-group-title:before {
+    content: "Hide";
+    padding: 0 10px;
+    display: inline-block;
+    position: absolute;
+    right: 0%;
+    opacity: 0;
+}
+
+#app .app-sidebar .ivu-menu-item-group-title:after {
+    content: "Collapse";
+    padding: 0 10px;
+    display: inline-block;
+    position: absolute;
+    right: calc(0% + 40px);
+    opacity: 0;
+}
+#app .app-sidebar .ivu-menu-item-group-title  {
+    height: 40px;
+    font-weight: 600;
+    margin-top: -5px;
+}
+
+#app .app-layout .submenu-title:hover .ivu-menu-item-group-title:before {
+    transition: opacity .3s ease .3s;
+    opacity: 1;
+}
+
+#app .app-layout .submenu-title:hover .ivu-menu-item-group-title:after {
+    transition: opacity .3s ease .7s;
+    opacity: 1;
+}
+
+
+#app .app-layout .collapsed-menu .submenu-title>.ivu-menu-submenu-title i {
+    transform: translateX(20px);
+    transition: font-size .2s ease .2s, transform .2s ease .2s;
+    vertical-align: middle;
+    font-size: 16px;
+}
+#app .app-sidebar .ivu-menu-item.ivu-menu-item-selected{
+    background-color: rgba(var(--light-A-gray), 1);
+}
+#app .app-sidebar .submenu-title > .ivu-menu-submenu-title {
+    color: rgba(var(--light-gray), 0.8);
+    padding-left: 0px;
+    padding-bottom: 3px;
+    /*margin-top: 5px;*/
+    margin-bottom: 5px;
+    border-bottom: 1px solid rgba(var(--light-gray), 1);
+    border-bottom: 1px solid rgba(var(--light-B-gray), 1);
+    border-bottom: none;
+    color: rgba(var(--dark-gray), 1);
+    
+    padding-top: 5px;
+    height: auto;
+    font-weight: 600;
+}
+#app .app-sidebar .submenu-title:hover > .ivu-menu-submenu-title  i:hover {
+    background-color: rgba(var(--dark-gray), 1);
+    transition: background-color .3s ease 0.1s, opacity .3s ease .1s;
+}
+#app .app-sidebar .submenu-title * {
+    color: rgba(var(--light-gray), 0.7);
+    /*font-weight: 500;*/
+    color: rgba(var(--light-gray), 1);
+    color: rgba(var(--dark-gray), 1);
+}
+#app .app-sidebar{
+    overflow: hidden;
+}
+#app .app-sidebar .submenu-title li .ivu-menu-submenu,
+#app .app-sidebar .submenu-title li .ivu-menu-submenu-title,
+#app .app-sidebar .submenu-title li .ivu-menu-item {
+    margin-left: -18px;
+}
+
+#app .app-sidebar .submenu-title>.ivu-menu-submenu-title .ivu-icon {
+    margin: 1px;
+    margin-left: 10px;
+    padding: 1px 3px;
+    /* border: 1px solid rgba(var(--light-gray), 1)3d; */
+}
+
+
+#app .app-sidebar .ivu-menu-submenu-title{
+    font-weight: 500;
+    color: rgba(var(--light-gray), 1);
+}
+#app .app-sidebar .ivu-menu-submenu-title,
+#app .app-sidebar .ivu-menuitem {
+    text-overflow: ellipsis;
+    /* width: 80%; */
+    height: 15px;
+    overflow: hidden;
+    display: block;
+}
+#app .app-sidebar .ivu-menu-submenu-title {
+    height: 25px;
+}
+#app .app-sidebar .ivu-menu-submenu-title,
+#app .app-sidebar .ivu-menu-item{
+    padding-top: 3px;
+    padding-bottom: 3px;
+    padding-right: 5px;
+
+}
+
+#app .app-layout .collapsed-menu .ivu-menu-submenu-title span {
+    display: none;
+}
+
+#app .app-layout .collapsed-menu .ivu-menu-submenu .ivu-icon-ios-arrow-down,
+#app .app-layout .collapsed-menu .ivu-menu span{
+    display: none;
+}
+
+#app .app-layout .collapsed-menu .ivu-menu {
+    overflow: hidden;
+    width: 69px;
+}
+
+#app .app-layout .ivu-menu-item i {
+    transform: translateX(0px);
+    transition: font-size .2s ease, transform .2s ease;
+    vertical-align: middle;
+    font-size: 16px;
+    opacity: 1;
+    display: inline-block;
+    width: 8px;
+}
+
+#app .app-layout .collapsed-menu span {
+    width: 0px;
+    transition: width .2s ease;
+}
+#app .app-layout .collapsed-menu i,
+#app .app-layout .collapsed-menu .ivu-menu .ivu-menu-item i {
+    transform: translateX(5px);
+    transition: font-size .2s ease .2s, transform .2s ease .2s;
+    vertical-align: middle;
+    font-size: 22px;
+}
+#app .app-layout .collapsed-menu .ivu-menu-submenu .ivu-menu-item i {
+    transform: translateX(-17px);
+    transition: font-size .2s ease .2s, transform .2s ease .2s, opacity .2s ease .2s;
+    vertical-align: middle;
+    font-size: 22px;
+    opacity: 0.3;
+}
+
+#app .app-layout .submenu-title>.ivu-menu-submenu-title .special-button.button-collapse {
+    width: 4em;
+    right: 5em;
+}
+#app .app-layout .submenu-title>.ivu-menu-submenu-title .button-collapse:before {
+    content: "Collapse";
+}
+#app .app-layout .submenu-title>.ivu-menu-submenu-title .special-button.button-hide {
+    width: 4em;
+    right: 0em;
+}
+#app .app-layout .submenu-title.ivu-menu-opened>.ivu-menu-submenu-title .button-hide:before {
+    content: "Hide";
+    width: 4em;
+}
+#app .app-layout .submenu-title>.ivu-menu-submenu-title .button-hide:before {
+    content: "Show";
+    width: 4em;
+}
+
+#app .app-layout .submenu-title:hover>.ivu-menu-submenu-title:hover .button-hide {
+    transition: opacity .3s ease .3s;
+    opacity: 0.6;
+}
+#app .app-layout .submenu-title:hover>.ivu-menu-submenu-title:hover .button-collapse {
+    transition: opacity .3s ease 2s;
+    opacity: 0.6;
+}
+
+#app .app-layout .app-sidebar.collapsed-menu .submenu-title>.ivu-menu-submenu-title .ivu-icon:not(.ivu-icon-ios-arrow-down) {
+    display: inline-block;
+}
+
+#app .app-layout .submenu-title>.ivu-menu-submenu-title .ivu-icon {
+    display: none;
+}
+#app .app-layout .submenu-title>.ivu-menu-submenu-title span:not(.special-button) {
+    padding-left: 25px;
+}
+#app .app-layout .submenu-title>.ivu-menu-submenu-title .special-button {
+    position: absolute;
+    right: 0;
+    top: 6px;
+    padding: 0 10px;
+
+}
+#app .app-layout .submenu-title>.ivu-menu-submenu-title .special-button,
+#app .app-layout .submenu-title>.ivu-menu-submenu-title i {
+    opacity: 0;
+}
+
+#app .app-layout .app-sidebar.collapsed-menu .submenu-title>.ivu-menu-submenu-title i {
+    opacity: 1;
+}
+
+/*
+#app .app-layout .collapsed-menu .submenu-title:hover>.ivu-menu-submenu-title i,
+#app .app-layout .submenu-title:hover>.ivu-menu-submenu-title i {
+    transition: opacity .3s ease .3s;
+    opacity: 1;
+}
+*/
+
+#app .app-layout .collapsed-menu .submenu-title>.ivu-menu-submenu-title i {
+    transform: translateX(20px);
+    transition: font-size .2s ease .2s, transform .2s ease .2s;
+    vertical-align: middle;
+    font-size: 16px;
+}
+
+#app .app-sidebar:after {
+    content: '';
+    display: block;
+    width: 1px;
+    height: 100%;
+    background: rgba(var(--light-C-gray), 1);
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    z-index: 1;
+}
+
+#app .app-sidebar .ivu-menu-submenu-title:not(.ivu-menu-item-selected):hover,
+#app .app-sidebar .ivu-menu-item:not(.ivu-menu-item-selected):hover {
+    border-right: 1px solid rgba(var(--light-C-gray), 1);
+    background-color: transparent;
+}
+
+
+#app .ivu-menu-vertical.ivu-menu-light:after {
+    display: none;
+}
+
+#app .ivu-menu-horizontal.ivu-menu-light:after {
+    display: none;
+}
+
+#app .app-title-tab>.ivu-tabs.ivu-tabs-card>.ivu-tabs-bar .nav-text.ivu-tabs-nav {
+    width: 100%;
+}
+#app .ivu-tabs.ivu-tabs-card>.ivu-tabs-bar .ivu-tabs-nav-container{
+    border: 1px solid rgba(var(--dark-gray), 0.4);
+    margin-top: -1px;
+    background: rgba(var(--light-G-gray), 136);
+    background-image: linear-gradient(to top, rgba(var(--light-X-gray), 1) 0%, rgba(var(--light-Y-gray), 1) 200%);
+}
+#app .app-title-tab>.ivu-tabs.ivu-tabs-card>.ivu-tabs-bar .ivu-tabs-tab.ivu-tabs-tab-active {
+    background-color: transparent;
+    color: rgba(var(--dark-gray), 1);
+    border-left: 1px solid rgba(var(--dark-gray), 0.4);
+    border-right: 1px solid rgba(var(--dark-gray), 0.4);
+    font-weight: normal;
+}
+#app .app-title-tab>.ivu-tabs.ivu-tabs-card>.ivu-tabs-bar .ivu-tabs-tab:not(.ivu-tabs-tab-active) {
+    background-image: linear-gradient(to top, rgba(var(--dark-gray), 0.3) 0%, rgba(var(--dark-gray), 0.35) 100%);
+}
+#app .app-title-tab>.ivu-tabs.ivu-tabs-card>.ivu-tabs-bar .ivu-tabs-tab:not(.ivu-tabs-tab-active):hover {
+    background-image: linear-gradient(to top, rgba(var(--dark-gray), 0.4) 0%, rgba(var(--dark-gray), 0.45) 100%);
+}
+#app .app-title-tab>.ivu-tabs.ivu-tabs-card>.ivu-tabs-bar .ivu-tabs-tab {
+    border-radius: 0;
+    width: 100%;
+    /*
+    background-color: rgba(var(--dark-gray), 0.3);
+    */
+    color: rgba(var(--dark-gray), 1);
+    text-align: center;
+    margin-right: 0;
+    padding-bottom: 5px;
+    height: 32px;
+    border: none;
+    font-weight: normal;
+}
+#app .app-title-tab.batch-model>.ivu-tabs.ivu-tabs-card>.ivu-tabs-bar .ivu-tabs-tab {
+    width: 50%;
+}
+
+#app .app-title-tab>.ivu-tabs.ivu-tabs-card>.ivu-tabs-bar .ivu-tabs-tab-active {
+    /*border-top: 1px solid rgba(var(--light-H-gray), 1);
+    border: none;*/
+    color: rgba(var(--dark-gray), 153);
+    text-align: center;
+    font-weight: 500;
+}
+#app .app-title-tab .ivu-tabs-bar{
+    margin-bottom: 0;
+}
+/*
+#app .app-title-tab>.ivu-tabs.ivu-tabs-card>.ivu-tabs-bar .ivu-tabs-tab-active:before {
+    content: '';
+    display: block;
+    width: 100%;
+    height: 1px;
+    background: #3399ff;
+    position: absolute;
+    top: 0;
+    left: 0;
+}*/
+#app .app-main-container{
+    width: 100%;
+    height: 100%;
+    overflow-y: scroll;
+}
+
+#app .app-sidebar .ivu-menu-item.link {
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+#app .app-sidebar .ivu-menu-item a{
+    width: 100%;
+    height: 100%;
+    display: inline-block;
+    padding-top: 3px;
+    padding-bottom: 3px;
+}
+
+#app .app-sidebar .ivu-menu-item a > i{
+    margin-right: 6px;
+}
+
+#app .app-sidebar .ivu-icon {
+    margin-top: -2px;
+}
+#app .single-settings {
+    width: 100%;
+}
+
+#app .single-settings .ivu-form-item-content{
+    display: flow-root;
+}
+#app .single-settings .ivu-input-wrapper.ivu-input-type,
+#app .single-settings .ivu-form-item-content,
+#app .single-settings .ivu-select.ivu-select-single
+{
+    width: 80%;
+}
+#app .single-settings-header .ivu-table-tip {
+    display: none;
+}
+#app .single-settings .ivu-collapse-header {
+    height: 33px;
+    margin-top: -4px;
+}
+#app .single-settings .ivu-form-item{
+    margin-bottom: 0;
+    padding: 0px 0;
+    border-bottom: 1px solid rgba(var(--light-C-gray), 0.87);
+    background-color: rgba(var(--light-D-gray), 1);
+}
+
+#app .single-settings .ivu-form-item:nth-child(2n){
+    background-color: rgba(var(--light-3-gray), 1);
+}
+
+#app .single-settings .ivu-input-number,
+#app .single-settings .ivu-input-number-input {
+    width: 180px;
+}
+
+#app .single-settings .ivu-form-item-content {
+    width: 250px;
+}
+
+#app .single-settings .ivu-collapse-header .ivu-icon {
+    margin-left: -10px;
+    margin-right: 5px;
+}
+#app .single-settings .ivu-collapse-content-box,
+#app .single-settings .ivu-collapse-content {
+    padding: 0;
+}
+
+#app .single-settings .ivu-form-item-label {
+    text-align: left;
+    margin-left: 15px;
+}
+
+#app .markdown>div {
+    padding: 20px;
+    font-size: 10pt;
+    line-height: 1.8;
+}
+#app .markdown table {
+    border-collapse: collapse;
+    margin: 10px auto;
+    color: rgba(var(--light-F-gray), 1);
+    background-color: rgba(var(--light-D-gray), 1);
+    box-sizing: border-box;
+    border: 1px solid rgba(var(--light-C-gray), 1);
+}
+#app .markdown table th,
+#app .markdown table td{
+    padding: 2px 30px;
+}
+#app .markdown table tr {
+    margin-bottom: 0;
+    padding: 0px 0;
+    border-bottom: 1px solid rgba(var(--light-C-gray), 1);
+}
+
+#app .markdown table thead tr {
+    background-color: rgba(var(--light-E-gray), 1);
+}
+
+#app .markdown table tr {
+    background-color: rgba(var(--light-D-gray), 1);
+}
+#app .markdown table tr:nth-child(2n) {
+    background-color: rgba(var(--light-3-gray), 1);
+}
+
+/*
+@import url(./css/markd3own.css);
+#app .markdown h1 {
+    font-size: 20px;
+    text-align: center;
+}
+#app .markdown h2 {
+    font-size: 18px;
+}
+#app .markdown h3 {
+    font-size: 15px;
+}
+*/
+
+#app .file-input {
+    display: flow-root;
+}
+
+#app .file-input .ivu-input-wrapper {
+    display: inline-block;
+    width: calc(100% - 35px);
+    position: relative;
+    vertical-align: middle;
+    line-height: normal;
+}
+/*
+#app .single-settings .ivu-form-item >*{
+    height: 20px;
+    padding-top: 3px;
+    padding-bottom: 3px;
+} 
+#app .single-settings .ivu-form-item-content {
+    height: 10px;
+}
+*/
+/*
+#app .single-settings .submit-buttons button
+*/
+
+/*
+.ivu-btn.ivu-btn-ghost {
+    background-color: rgba(var(--light-D-gray), 1);
+}
+#app .single-settings .submit-buttons {
+    background-color: rgba(var(--light-G-gray), 136);
+}
+*/
+#app .single-settings .submit-buttons {
+    float: right;
+    text-align: center;
+    width: 100%;
+    padding: 10px 0;
+}
+
+
+#app .single-settings .submit-buttons .ivu-form-item-content {
+    /*
+    float: right;
+    left: 0;
+    */
+    width: 100%;
+    margin: 0!important;
+}
+
+#app .single-settings .submit-buttons .ivu-form-item-content button {
+    margin-left: 10px;
+    margin-right: 10px;
+    float: right;
+}
+
+#app .reduced-path-entry{
+    margin-left: 5px;
+}
+
+#app .complete-path-entry{
+    width: 100%;
+}
+
+#app .single-settings .ivu-form-item.include-dataset {
+    padding: 10px 0;
+}
+#app .include-dataset button{
+    float: right;
+}
+#app .batch-settings-header table tr td:first-child>div.ivu-table-cell {
+    padding-left: 8px;
+    padding-right: 5px;
+}
+
+
+/**/
+#app .app-toolbar > *{
+    margin: auto;
+}
+#app .app-toolbar{
+    padding: 5px 0;
+    width: 100%;
+    text-align: center;
+}
+#app .app-toolbar {
+    background-image: linear-gradient(to top, rgba(var(--light-X-gray), 1) 0%, rgba(var(--light-Y-gray), 1) 200%);
+}
+#app .ivu-tabs.graphical-results .ivu-tabs-nav-container {
+    display: none;
+}
+
+#app .app-main-container .app-title-tab.app-expand-screen iframe,
+#app .app-main-container .app-title-tab.app-expand-screen,
+#app .app-main-container .app-title-tab.app-expand-screen .ivu-tabs,
+#app .app-main-container .app-title-tab.app-expand-screen .ivu-tabs .ivu-tabs-content,
+#app .app-main-container .app-title-tab.app-expand-screen .ivu-tabs .ivu-tabs-content .ivu-tabs-tabpane {
+    width: 100%;
+    height: 100%;
+}
+#app .app-main-container .app-title-tab.app-expand-screen .ivu-tabs .ivu-tabs-content .ivu-tabs-tabpane:not(.no-scroll) {
+    overflow: scroll;
+}
+#app .app-main-container .app-title-tab.app-expand-screen iframe {
+    border: none;
+}

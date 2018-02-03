@@ -1,0 +1,12 @@
+*{
+    cursor: default!important;
+    -webkit-touch-callout: none;
+    user-select: none;
+}
+
+*[type="text"],
+*[selectable] {
+    cursor: text;
+    -webkit-touch-callout: all;
+    user-select: all;
+}
