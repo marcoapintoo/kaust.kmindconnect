@@ -13,7 +13,7 @@
 
             <iview-submenu name="documentation">
                 <template slot="title">
-                    <Icon type="ios-bookmarks"></Icon>
+                    <Icon type="help-bouy"></Icon>
                         <span> Documentation </span>
                 </template>
                 <iview-Menu-item name="documentation-1" class="link">
@@ -41,10 +41,16 @@
                         <span>Model settings</span>
                     </router-link>
                 </iview-Menu-item>
+                <iview-Menu-item name="exploratoryLog" ref="exploratoryLog" class="link">
+                    <router-link to="/svar/single/log">
+                        <Icon type="clipboard"></Icon>
+                        <span>Execution progress</span>
+                    </router-link>
+                </iview-Menu-item>
                 <iview-Menu-item name="e-2" class="link">
                     <router-link to="/svar/single/results">
                         <Icon type="stats-bars"></Icon>
-                        <span>Visual results</span>
+                        <span>Results</span>
                     </router-link>
                 </iview-Menu-item>
             </iview-submenu>
@@ -52,7 +58,7 @@
             <iview-submenu name="batch">
                 <template slot="title">
                     <Icon type="social-buffer"></Icon>
-                    <span> Batch mode analysis </span>
+                    <span> Batch processing</span>
                 </template>
                 <iview-Menu-item name="b-1" class="link">
                     <router-link to="/svar/batch/settings">
@@ -60,10 +66,16 @@
                         <span>Model settings</span>
                     </router-link>
                 </iview-Menu-item>
+                <iview-Menu-item name="batchLog" ref="batchLog" class="link">
+                    <router-link to="/svar/batch/log">
+                        <Icon type="clipboard"></Icon>
+                        <span>Execution progress</span>
+                    </router-link>
+                </iview-Menu-item>
                 <iview-Menu-item name="b-2" class="link">
                     <router-link to="/svar/batch/results">
                         <Icon type="map"></Icon>
-                        <span>Visual results</span>
+                        <span>Results explorer</span>
                     </router-link>
                 </iview-Menu-item>
             </iview-submenu>
@@ -73,20 +85,24 @@
         <iview-submenu name="configuration" class="submenu-title" @click="preventCollapse">
             <template slot="title">
                 <i :class="subMenuTitleButtonClass" @click="collapsedSider"></i>
-                <span style="width: 100%;display: inline-block;" @click.prevent.stop="preventCollapse">Configuration</span>
+                <span style="width: 100%;display: inline-block;" @click.prevent.stop="preventCollapse">
+                    Configuration
+                </span>
                 <span class="special-button button-hide" @click="toogleSubMenu"></span>
                 <span class="special-button button-collapse" @click="collapsedSider"></span>
             </template>
 
-        <iview-Menu-item name="settings">
-            <Icon type="settings"></Icon>
-            <span> Environment Settings </span>
+        <iview-Menu-item name="settings" class="link">
+            <router-link to="/global/settings">
+                <Icon type="settings"></Icon>
+                <span> Environment Settings</span>
+            </router-link>
         </iview-Menu-item>
         
         <iview-Menu-item name="document" class="link">
-            <router-link to="/svar/documentation">
+            <router-link to="/about">
                 <Icon type="document"></Icon>
-                <span>Model description</span>
+                <span>About...</span>
             </router-link>
         </iview-Menu-item>
         

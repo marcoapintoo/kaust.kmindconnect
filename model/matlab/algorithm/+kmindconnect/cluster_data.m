@@ -10,6 +10,7 @@
 
 function [St_km, A_km, C] = cluster_data(p, K, tvvar_vec, y)
 
+    disp(sprintf(':: ACTIVITY: Applying a VNS model'))
     [St_km, C, ~, ~] = kmindconnect.clustering.variable_neighbour_search(tvvar_vec, K);
 
     [N, T] = size(y);
@@ -27,6 +28,7 @@ function [St_km, A_km, C] = cluster_data(p, K, tvvar_vec, y)
         tj(j) = t - 1;
     end
 
+    disp(sprintf(':: ACTIVITY: Estimate state-specific VAR'))
     % Estimate state-specific VAR
     A_km = zeros(N, N * p, K);
     for j = 1:K

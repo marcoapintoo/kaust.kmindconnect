@@ -27,47 +27,40 @@ function [A0, Q0, R0, fSt, sSt, Fxt, Sxt, Ahat, Qhat, Rhat, Zhat, LL, St_skf, St
 
 
     for it=1:1:ItrNo
-        disp('=========== 1')
+        disp(sprintf(':: ACTIVITY: [%d] Initialize Kalman states', it))
         [x, P, S] = kmindconnect.kalman_filter.initialize_states(d_state, M, T, x_0, S, pi_);
 
-        disp('=========== 2')
+        disp(sprintf(':: ACTIVITY: [%d] Applying Kalman filter', it))
         [xx_minus, PP_minus, Pe, e, L, S, xhat, Phat, xhat_full, Phat_full, Z] = kmindconnect.kalman_filter.kalman_filter(y, x, P, A, H, Q, R, L, xhat, Phat, xhat_full, Phat_full, xx_minus, PP_minus, S, Z);
         % Filtered state sequence
         fSt(2:T,:) = S(2:T,:);
-        disp('=========== 3')
+        disp(sprintf(':: ACTIVITY: [%d] Applying Kalman smooter', it))
         [xs_t, xshat, Pshat, xshat_full, Pshat_full, U_t, S_MtT] = kmindconnect.kalman_filter.kalman_smoother(T, A, S, xhat, Phat, xhat_full, Phat_full, xshat, Pshat, PP_minus, xx_minus, Jt, Z);
         % Smoothed state sequence
         sSt = S_MtT(1:T,:);
-        disp('=========== 4')
+        disp(sprintf(':: ACTIVITY: [%d] Calculate cross variance', it))
         P_ttm1T = kmindconnect.kalman_filter.get_cross_variance_terms(A, T, M, Phat, Jt, P_ttm1T);
-        disp('=========== 5')
         P_ttm1T_full = kmindconnect.kalman_filter.cross_collapse_cross_variance(T, M, d_state, U_t, xshat, xs_t, S_MtT, P_ttm1T);
-        disp('=========== 6')
+        disp(sprintf(':: ACTIVITY: [%d] Calculate log-likelihood', it))
         LL(it) = kmindconnect.kalman_filter.log_likelihood(T, Pe, e, S, Z);
-        disp('=========== 6')
         DeltaL = abs((LL(it)-OldL)/LL(it)); % Stoping Criterion (Relative Improvement)
         %fprintf('  Improvement in L = %.2f\n',DeltaL);
         if(DeltaL < eps)
             break;
         end
         OldL = LL(it);
-        disp('=========== 7')
+        disp(sprintf(':: ACTIVITY: [%d] Parameter optimization E-phase', it))
         [S_t, S_ttm1] = kmindconnect.kalman_filter.estimation_step(d_state, T, Pshat_full, P_ttm1T_full, xshat_full);
-        disp('=========== 8')
+        disp(sprintf(':: ACTIVITY: [%d] Parameter optimization M-phase', it))
         [Q, R] = kmindconnect.kalman_filter.maximization_step(p, M, d_state, A, Q, H, R, y, S_MtT, S_ttm1, S_t, xshat_full);
     end
     Ahat=A; Qhat=Q; Rhat=R; Zhat=Z;
 
     Fxt = xhat_full;
     Sxt = xshat_full;
-
+    
+    disp(sprintf(':: ACTIVITY: [%d] Estimate state sequences', it))
     % Obtain estimated state sequence
     [~, St_skf] = max(fSt, [], 2);
-    size(fSt)
-    size(St_skf)
-    St_skf
     [~, St_sks] = max(sSt, [], 2);
-    size(sSt)
-    size(St_sks)
-    St_sks
 end

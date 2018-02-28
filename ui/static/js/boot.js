@@ -48,5 +48,7 @@ iview.getTagNamesFromElement = (element) => {
     return html;
 }
 nativeready(function () {
+    //!DONT REMOVE
+    Array.from(document.querySelectorAll('a[href^="http"]')).forEach((e) => { e.target = '_blank' })
 });
 

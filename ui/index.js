@@ -1,6 +1,28 @@
 'use strict';
 
-const electron = require('electron');  
+const electron = require('electron');
+
+var menuTemplate = [{
+  label: "kMindConnect",
+  submenu: [
+    { label: "About Application", selector: "orderFrontStandardAboutPanel:" },
+    { type: "separator" },
+    { label: "Quit", accelerator: "CmdOrCtrl+Q", click: function () { app.quit(); } }
+  ]
+}, {
+  label: "Edit",
+  submenu: [
+    { label: "Undo", accelerator: "CmdOrCtrl+Z", selector: "undo:" },
+    { label: "Redo", accelerator: "Shift+CmdOrCtrl+Z", selector: "redo:" },
+    { type: "separator" },
+    { label: "Cut", accelerator: "CmdOrCtrl+X", selector: "cut:" },
+    { label: "Copy", accelerator: "CmdOrCtrl+C", selector: "copy:" },
+    { label: "Paste", accelerator: "CmdOrCtrl+V", selector: "paste:" },
+    { label: "Select All", accelerator: "CmdOrCtrl+A", selector: "selectAll:" }
+  ]
+}
+];
+
 const app = electron.app;  
 const BrowserWindow = electron.BrowserWindow;
 let mainWindowIcon = __dirname + '/static/images/icon';
@@ -34,8 +56,9 @@ app.on('ready', function () {
     //frame: false,
   });
 
-  mainWindow.setMenu(null);
-  mainWindow.loadURL('file://' + __dirname + '/static/index.html');
+
+  mainWindow.setMenu(electron.Menu.buildFromTemplate(menuTemplate));
+  mainWindow.loadURL('file://' + __dirname + '/static/index.html?{"dirname": "' + __dirname + '"}');
 
   mainWindow.on('closed', function() {
     mainWindow = null;

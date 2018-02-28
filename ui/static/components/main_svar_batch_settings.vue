@@ -8,7 +8,7 @@
                 -->
 
                 <iview-form :label-width="250" class="single-settings">
-                    <app-svar-settings ref="settings">
+                    <app-svar-settings ref="settings" type="batch">
                     </app-svar-settings>
                 </iview-form>
 
@@ -27,28 +27,28 @@
                             Data sources
                             
                             <iview-form-item label="Path file" slot="content">
-                                <file-input v-model="datasetPath"></file-input>
+                                <file-input v-model="model.input_path"></file-input>
                             </iview-form-item>
 
-                            <iview-form-item label=".MAT field name" slot="content" v-if="datasetPath.toLowerCase().endsWith('.mat')">
-                                <iview-input v-model="datasetMatlabField"
+                            <iview-form-item label=".MAT field name" slot="content" v-if="model.input_path.toLowerCase().endsWith('.mat')">
+                                <iview-input v-model="model.matlab_field_name"
                                 placeholder="Select a field name" ></iview-input>
                             </iview-form-item>
                                         
                             <iview-form-item label="" slot="content" class="submit-buttons">
                                 <iview-button size="small" type="primary"
-                                :disabled="datasetPath.trim()==''"
+                                :disabled="model.input_path.trim()==''"
                                  @click.prevent.stop="insert"> Include dataset </iview-button>
                             </iview-form-item>
 
                         </iview-panel>
                     </iview-collapse>
 
-                    <i-table class="batch-settings-header" style="border:none;" border :columns="columns7" :data="data6"></i-table>
+                    <i-table class="batch-settings-header" style="border:none;" border :columns="columns7" :data="model.input_paths"></i-table>
 
                     <iview-form-item class="submit-buttons">
                         <iview-button size="small" type="ghost" @click.prevent.stop="resetFields"> Reset fields</iview-button>
-                        <iview-button size="small" type="primary" @click.prevent.stop="runModel"> Run model </iview-button>
+                        <iview-button size="small" type="primary" @click.prevent.stop="runModel" :disabled="model.input_paths.length==0" > Run model </iview-button>
                     </iview-form-item>
                 </iview-form>
             </iview-tab-pane>
@@ -80,8 +80,7 @@ var ApplicationSVARBatchSettings = {
         return {
             collapsedDataset: '1',
             //
-            datasetPath: '',
-            datasetMatlabField: '',
+            model: svarstate['batchSettings'],
             //
             headerColumns: [
                 {
@@ -158,7 +157,7 @@ var ApplicationSVARBatchSettings = {
                                 props: {
                                 },
                                 class: 'reduced-path-entry',
-                            }, basename(params.row.path))
+                            }, basename(params.row.input_path))
                         ]);
                     }
                 },
@@ -171,7 +170,7 @@ var ApplicationSVARBatchSettings = {
                                 props: {
                                 },
                                 class: 'type-path-entry',
-                            }, datasetType(params.row.path))
+                            }, datasetType(params.row.input_path))
                         ]);
                     }
                 },
@@ -182,7 +181,7 @@ var ApplicationSVARBatchSettings = {
                         return h('div', [
                             h('Input', {
                                 props: {
-                                value: params.row.path,
+                                value: params.row.input_path,
                                 readonly: "readonly"
                                 },
                                 class: 'complete-path-entry',
@@ -192,35 +191,17 @@ var ApplicationSVARBatchSettings = {
                 },
                 {
                     title: 'Field name',
-                    key: 'fieldname',
+                    key: 'matlab_field_name',
                     render: (h, params) => {
-                        return params.row.fieldname? h('div', [
+                        return params.row.matlab_field_name? h('div', [
                             h('span', {
                                 props: {
                                 },
                                 class: 'field-entry',
-                            }, params.row.fieldname)
+                            }, params.row.matlab_field_name)
                         ]): "";
                     }
                 },
-            ],
-            data6: [
-                {
-                    fieldname: 'John Brown',
-                    path: '/a/b/f/t/g.mat'
-                },
-                {
-                    fieldname: '',
-                    path: '/a/b/f/t//a/b/f/t/.mat/a/b/f/t/.mat/a/b/f/t/.mat/a/b/f/t/r.mat'
-                },
-                {
-                    fieldname: 'Joe Black',
-                    path: '/a/b/f/t/f.mat'
-                },
-                {
-                    fieldname: 'Jon Snow',
-                    path: 'Ottawa No. 2 Lake Park/a/b/fOttawa No. 2 Lake Park/a/b/fOttawa No. 2 Lake Park/a/b/fOttawa No. 2 Lake Park/a/b/fOttawa No. 2 Lake Park/a/b/f/t/knhbjkl.mat'
-                }
             ],
         }
     },
@@ -229,58 +210,56 @@ var ApplicationSVARBatchSettings = {
             //
         },
         resetFields(){
-            this.$refs.settings.resetFields()
-            this.datasetPath = ''
-            this.datasetMatlabField = ''
+            svarstate.resetBatchValues()
         },
         runModel(){
-            //
+            svarstate.execute(this, "batch")
         },
 
         insert () {
-            this.data6.push(
-                {
-                    path: this.datasetPath,
-                    fieldname: this.datasetMatlabField,
-                })
+            this.model.input_paths.push(
+            {
+                input_path: this.model.input_path,
+                matlab_field_name: this.model.matlab_field_name,
+            })
         },
 
         show (index) {
             var message = "";
             var fields = this.$refs.settings.getFieldValues()
-            fields.splice(0, ["Type", datasetType(this.data6[index].path)])
-            fields.push(["Path", this.data6[index].path])
-            fields.push(["MATLAB field name", this.data6[index].fieldname])
+            fields.splice(0, ["Type", datasetType(this.model.input_paths[index].input_path)])
+            fields.push(["Path", this.model.input_paths[index].input_path])
+            fields.push(["MATLAB field name", this.model.input_paths[index].matlab_field_name])
             for (let i = 0; i < fields.length; i++) {
                 const element = fields[i];
                 if(element[1].toString().trim() == '') continue
                 message += `<strong>${element[0]}</strong>: ${element[1]} <br/>`
             }
             this.$Modal.info({
-                title: `Dataset ${basename(this.data6[index].path)}`,
+                title: `Dataset ${basename(this.model.input_paths[index].input_path)}`,
                 content: message
             })
             /*
             this.$Modal.info({
-                title: `Dataset ${basename(this.data6[index].path)}`,
+                title: `Dataset ${basename(this.input_paths[index].path)}`,
                 content: `
-                <strong>Type</strong>: ${datasetType(this.data6[index].path)}
+                <strong>Type</strong>: ${datasetType(this.input_paths[index].path)}
                 <br/>
-                <strong>Path</strong>: ${this.data6[index].path}
+                <strong>Path</strong>: ${this.input_paths[index].path}
                 <br/>
-                <strong>MATLAB field name</strong> (if applicable): ${this.data6[index].fieldname}
+                <strong>MATLAB field name</strong> (if applicable): ${this.input_paths[index].matlab_field_name}
                 `
             })
             */
         },
         remove (index) {
-            this.data6.splice(index, 1);
+            this.model.input_paths.splice(index, 1);
         }
     },
     computed: {
     },
     watch: {
-        datasetPath(ne){
+        input_path(ne){
             console.log(this)
             console.log(ne)
         }

@@ -48,6 +48,7 @@
                 </iview-form-item>
             </iview-panel>
         </iview-collapse>
+
     </div>
 </template>
 
@@ -65,7 +66,7 @@ class ApplicationSVARModel{
         this.surface_pattern = ''
         this.surface_roi_names = ''
         */
-        this.defaultValues ={
+        this.defaultValues = {
             tvvar_model_order: 1,
             tvvar_window_shift: 1,
             tvvar_window_width: 100,
@@ -99,19 +100,15 @@ class ApplicationSVARModel{
         return commandArgs//.join(" ")
     }
 }
-var ApplicationSVARBaseModel = () => { return {
-    tvvar_model_order: 1,
-    tvvar_window_shift: 1,
-    tvvar_window_width: 100,
-    cluster_number: 3,
-    em_iterations: 15,
-    em_tolerance_error: 1e-10,
-    surface_pattern: '',
-    surface_roi_names: '',
-}}
 
 var ApplicationSVARSettings = {
     template: iview.getTagNamesFromElement(document.currentScript.previousElementSibling),
+    props: {
+        'type':{
+            type: String,
+            default: 'single',
+        }
+    },
     data(){
         return {
             collapsedTVVAR: '1',
@@ -120,10 +117,16 @@ var ApplicationSVARSettings = {
             collapsedSurface: '1',
             //
             //model: ApplicationSVARBaseModel(),
-            model: new ApplicationSVARModel(),
+            model: svarstate[this._props.type.toLowerCase() + "Settings"],
         }
     },
     methods: {
+        collapseEverything(){
+            this.collapsedTVVAR = true
+            this.collapsedClustering = true
+            this.collapsedEM = true
+            this.collapsedSurface = true
+        },
         resetFields(){
             //this.model = ApplicationSVARBaseModel()
             this.model.resetValues()

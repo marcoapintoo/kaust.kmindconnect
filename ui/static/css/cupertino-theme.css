@@ -371,7 +371,7 @@
     width: 100%;
 }
 #app .ivu-tabs.ivu-tabs-card>.ivu-tabs-bar .ivu-tabs-nav-container{
-    border: 1px solid rgba(var(--dark-gray), 0.4);
+    border-bottom: 1px solid rgba(var(--dark-gray), 0.4);
     margin-top: -1px;
     background: rgba(var(--light-G-gray), 136);
     background-image: linear-gradient(to top, rgba(var(--light-X-gray), 1) 0%, rgba(var(--light-Y-gray), 1) 200%);
@@ -379,8 +379,10 @@
 #app .app-title-tab>.ivu-tabs.ivu-tabs-card>.ivu-tabs-bar .ivu-tabs-tab.ivu-tabs-tab-active {
     background-color: transparent;
     color: rgba(var(--dark-gray), 1);
+    /*
     border-left: 1px solid rgba(var(--dark-gray), 0.4);
     border-right: 1px solid rgba(var(--dark-gray), 0.4);
+    */
     font-weight: normal;
 }
 #app .app-title-tab>.ivu-tabs.ivu-tabs-card>.ivu-tabs-bar .ivu-tabs-tab:not(.ivu-tabs-tab-active) {
@@ -431,7 +433,13 @@
 #app .app-main-container{
     width: 100%;
     height: 100%;
-    overflow-y: scroll;
+    overflow: auto;
+    overflow-y: auto;
+    overflow-x: auto;
+}
+
+#app .ivu-scroll-container{
+    overflow: auto;
 }
 
 #app .app-sidebar .ivu-menu-item.link {
@@ -642,6 +650,8 @@
     text-align: center;
 }
 #app .app-toolbar {
+    border: 1px solid rgba(var(--dark-gray), 0.4);
+    margin-top: -1px;
     background-image: linear-gradient(to top, rgba(var(--light-X-gray), 1) 0%, rgba(var(--light-Y-gray), 1) 200%);
 }
 #app .ivu-tabs.graphical-results .ivu-tabs-nav-container {
@@ -661,4 +671,151 @@
 }
 #app .app-main-container .app-title-tab.app-expand-screen iframe {
     border: none;
+}
+
+#app .large-switch.ivu-switch-checked .ivu-switch-inner {
+    left: 50%;
+}
+#app .large-switch.ivu-switch-checked:after {
+    left: 127px;
+}
+#app .large-switch.ivu-switch {
+    width: 150px;
+}
+
+#app .app-log .console-output.stderr {
+    color: red;
+}
+#app .app-log .console-output {
+    font-size: 8pt;
+    font-family: 'consolas', 'Courier New', Courier, monospace;
+    margin: 0;
+}
+#app .app-log .ivu-card-head {
+    height: 30px;
+    padding-top: 5px;
+    padding-left: 15px;
+    padding-bottom: 1px;
+    padding-right: 15px;
+    border-bottom: 1px solid rgba(var(--dark-gray), 0.4);
+    background-image: linear-gradient(to top, rgba(var(--light-X-gray), 1) 0%, rgba(var(--light-Y-gray), 1) 200%);
+}
+#app .app-log .ivu-card-head > p:first-child {
+    color: rgba(var(--dark-gray), 1);
+    text-align: center;
+    font-weight: normal;
+    font-size: 14px;
+}
+#app .app-log .ivu-col {
+    border: 1px solid rgba(var(--light-Y-gray), 1);
+}
+#app .app-log .ivu-row,
+#app .app-log .ivu-card-body,
+#app .app-log .ivu-card {
+    /*height: 100%;*/
+}
+#app .app-log .ivu-card-body .ivu-scroll-container {
+    height: 500px!important;
+}
+#app .console-output *{
+    user-select: text;
+}
+
+#app .ivu-tabs-content .ivu-tabs-tabpane .toolbar{
+}
+#app .ivu-tabs-content .ivu-tabs-tabpane .content{
+    width: 500px;
+    margin: auto;
+    border: 1px solid rgba(var(--dark-gray), 0.4);
+    border-radius: 5px;
+    margin-bottom: 10px;
+    overflow: hidden;
+}
+
+#app .ivu-tabs-content .ivu-tabs-tabpane .content img{
+    width: 100%;
+}
+#app .ivu-tabs-content .ivu-tabs-tabpane .content iframe{
+    height: 400px;
+}
+
+.console-output.ivu-card{
+    background-color: darkslategray;
+    color: white;
+}
+
+#app .ivu-steps-item.ivu-steps-status-finish .ivu-steps-title{
+    opacity: 0.6;
+}
+
+#app .error.ivu-steps-item .ivu-steps-title {
+    color: brown;
+}
+
+#app .activity.ivu-steps-item .ivu-steps-title {
+    color: steelblue;
+}
+
+#app .status.ivu-steps-item .ivu-steps-title {
+    color: steelblue;
+}
+
+#app .finish.ivu-steps-item .ivu-steps-title,
+#app .start.ivu-steps-item .ivu-steps-title {
+    color: salmon;
+}
+/*
+
+#app .error.ivu-steps-item.ivu-steps-status-finish .ivu-steps-head-inner,
+#app .error.ivu-steps-item.ivu-steps-status-finish .ivu-steps-title {
+    opacity: 0.6;
+}
+#app .error.ivu-steps-item .ivu-steps-head-inner {
+    opacity: 1;
+    color: white;
+}
+#app .error.ivu-steps-item .ivu-steps-head-inner {
+    border-color: brown;
+    background-color: brown;
+}
+#app .error.ivu-steps-item .ivu-steps-title {
+    color: brown;
+}
+#app .activity.ivu-steps-item.ivu-steps-status-process .ivu-steps-head-inner{
+    border-color: black;
+    background-color: black;
+}
+
+#app .activity.ivu-steps-item .ivu-steps-title {
+    color: brown;
+}
+#app .status.ivu-steps-item .ivu-steps-head-inner {
+    border-color: steelblue;
+    background-color: steelblue;
+}
+
+#app .status.ivu-steps-item .ivu-steps-title {
+    color: brown;
+}
+#app .start.ivu-steps-item .ivu-steps-head-inner {
+    border-color: orange;
+    background-color: orange;
+}
+
+#app .start.ivu-steps-item .ivu-steps-title {
+    color: brown;
+}
+#app .finish.ivu-steps-item .ivu-steps-head-inner {
+    border-color: salmon;
+    background-color: salmon;
+}
+#app .finish.ivu-steps-item .ivu-steps-title {
+    color: brown;
+}
+*/
+
+#app .about img {
+    width: 300px;
+    margin: auto;
+    display: block;
 }

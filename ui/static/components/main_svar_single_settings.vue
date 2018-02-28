@@ -19,17 +19,17 @@
                         <iview-panel name="1">
                             Data sources
                             <iview-form-item label="Path file" slot="content">
-                                <file-input v-model="datasetPath"></file-input>
+                                <file-input v-model="model.input_path"></file-input>
                             </iview-form-item>
-                            <iview-form-item label=".MAT field name" slot="content" v-if="datasetPath.toLowerCase().endsWith('.mat')">
-                                <iview-input size="small" v-model="datasetMatlabField" placeholder="Select a file"></iview-input>
+                            <iview-form-item label=".MAT field name" slot="content" v-if="model.input_path.toLowerCase().endsWith('.mat')">
+                                <iview-input size="small" v-model="model.matlab_field_name" placeholder="Select a file"></iview-input>
                             </iview-form-item>
                         </iview-panel>
                     </iview-collapse>
 
                     <iview-form-item class="submit-buttons">
                         <iview-button size="small" type="ghost" @click.prevent.stop="resetFields"> Reset fields</iview-button>
-                        <iview-button size="small" type="primary" @click.prevent.stop="runModel"> Run model </iview-button>
+                        <iview-button size="small" type="primary" @click.prevent.stop="runModel" :disabled="model.input_path==''"> Run model </iview-button>
                     </iview-form-item>
 
                 </iview-form>
@@ -46,8 +46,7 @@ var ApplicationSVARSingleSettings = {
         return {
             collapsedDataset: '1',
             //
-            datasetPath: '',
-            datasetMatlabField: '',
+            model: svarstate['singleSettings'],
             //
             headerColumns: [
                 {
@@ -70,16 +69,10 @@ var ApplicationSVARSingleSettings = {
             //
         },
         resetFields(){
-            this.$refs.settings.resetFields()
-            this.datasetPath = ''
-            this.datasetMatlabField = ''
+            svarstate.resetSingleValues()
         },
         runModel(){
-            const commandLine = this.$refs.settings.model.toCommandLineArgs({
-                input_path: this.datasetPath,
-                matlab_field_name: this.datasetMatlabField,
-            })
-            this.$root.$emit('execution-start', this, "svar", commandLine);
+            svarstate.execute(this, 'single')
             this.panelDisabled = true;
         },
         modelFinished(status, errorData){
@@ -116,12 +109,6 @@ var ApplicationSVARSingleSettings = {
             ]
         }
     },
-    watch: {
-        datasetPath(ne){
-            console.log(this)
-            console.log(ne)
-        }
-    }
 }
 Vue.component('app-svar-single-settings', ApplicationSVARSingleSettings)
 

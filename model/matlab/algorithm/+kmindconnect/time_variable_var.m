@@ -11,6 +11,7 @@
 function [tvvar_vec] = time_variable_var(p, wlen, shift, y)
     [N, T] = size(y);
 
+    disp(sprintf(':: ACTIVITY: Time windowing'))
     tvvar_vec = zeros(p * N ^ 2, T); %TV-VAR coeffs
     win = rectwin(wlen); % form a window
 
@@ -18,6 +19,7 @@ function [tvvar_vec] = time_variable_var(p, wlen, shift, y)
     indx = 0; t = 1;
     Yw = zeros(N, wlen);
 
+    disp(sprintf(':: ACTIVITY: Estimate TV-VAR coefficients'))
     % Short-Time VAR Analysis
     while indx + wlen <= T
         % windowing

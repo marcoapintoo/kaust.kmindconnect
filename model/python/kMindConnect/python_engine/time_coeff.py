@@ -18,6 +18,7 @@ class TVVAR:
     def time_variable_var(self, p, wlen, shift, y):
         N, T = y.shape
 
+        print(':: ACTIVITY: Time windowing')
         tvvar_vec = np.zeros((p * N ** 2, T)) # TV - VAR coeffs
         win = scipy.signal.boxcar(wlen)  # form a window
 
@@ -26,6 +27,7 @@ class TVVAR:
         t = 0
         Yw = np.zeros((N, wlen))
 
+        print(':: ACTIVITY: Estimate TV-VAR coefficients')
         # Short - Time VAR Analysis
         while indx + wlen <= T:
             # windowing

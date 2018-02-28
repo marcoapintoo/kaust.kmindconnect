@@ -32,9 +32,9 @@ Y_{t}=\sum_{\ell=1}^{P}\Phi_{\ell t}Y_{t-\ell}+v_{t}
 $$
 
 * $\Phi_{\ell t}$: $N\times N$ matrix of VAR coefficients 
-at a lag $\ell$ and time $t$.\\\vspace{1mm}
+at a lag $\ell$ and time $t$.
 
-## Coefficients clusterization
+## Coefficients clustering
 
 K-means was used to find clusters of time points (related with the TV-VAR coefficients)
 in a $L_1$ neighborhood.
@@ -63,7 +63,7 @@ $$
 \Theta = \left\{\Theta_{[j]}\right\}\qquad\Theta_{[j]}=\left(A_{[j]},Q_{[j]},R_{[j]}\right)
 $$
 
-* $A_{[S_{t}]}$: describes the effective connectivity across states,\\\vspace{-1.2em}
+* $A_{[S_{t}]}$: describes the effective connectivity across states,
 * $R_{[S_{t}]}, Q_{[S_{t}]}$: covariance in the canonical linear gaussian state-space.
 
 # References

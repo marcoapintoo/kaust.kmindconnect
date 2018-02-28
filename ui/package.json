@@ -1,6 +1,6 @@
 {
   "name": "kmindconnect",
-  "version": "0.6.0",
+  "version": "0.2.0a",
   "description": "Brain Connectivity Analysis",
   "main": "./index.js",
   "scripts": {
@@ -13,7 +13,7 @@
   "license": "MIT/GPL",
   "devDependencies": {},
   "build": {
-    "icon": "static/images/icon.png",
+    "icon": "static/images/icon",
     "appId": "tonitruum.kmindconnect",
     "electronVersion": "1.8.2-beta.5",
     "files": [
@@ -48,7 +48,8 @@
       }
     ],
     "mac": {
-      "category": "tonitruum.kmindconnect"
+      "category": "tonitruum.kmindconnect",
+      "entitlements": "entitlements.mac.plist"
     },
     "win": {
       "target": "portable"

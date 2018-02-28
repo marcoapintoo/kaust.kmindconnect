@@ -20,6 +20,7 @@ class Clustering:
         self.state_sequence = np.array(St_km)
 
     def cluster_data(self, p, K, tvvar_vec, y):
+        print(':: ACTIVITY: Applying a VNS model')
         #St_km, C, _, _ = self.engine.feval("kmindconnect.clustering.variable_neighbour_search.m", tvvar_vec, K, nout=4)
         St_km, C, _, _ = self.variable_neighbour_search(tvvar_vec, K)
         St_km, C = self.stabilize_states(St_km, C)
@@ -35,6 +36,7 @@ class Clustering:
                     t += 1
             tj[j] = t - 1
 
+        print(':: ACTIVITY: Estimate state-specific VAR')
         # Estimate state - specific VAR
         A_km = np.zeros((N, N * p, K))
         for j in np.arange(K):

@@ -72,30 +72,35 @@ class SVAR:
         xshat = np.zeros((d_state, M, T), dtype="f8")
         Pshat = np.zeros((d_state, d_state, M, T), dtype="f8")
 
-
         for it in np.arange(0, ItrNo):
+            print(':: ACTIVITY: [%d] Initialize Kalman states'%it)
             #[x, P, S] = self.engine.feval("kmindconnect.kalman_filter.initialize_states.m", d_state, M, T, x_0, S, pi, nout=3)
             x, P, S = self.initialize_states(d_state, M, T, x_0, S, pi)
-
+            print(':: ACTIVITY: [%d] Applying Kalman filter' % it)
             [xx_minus, PP_minus, Pe, e, L, S, xhat, Phat, xhat_full, Phat_full, Z] = self.engine.feval("kmindconnect.kalman_filter.kalman_filter.m", y, x, P, A, H, Q, R, L, xhat, Phat, xhat_full, Phat_full, xx_minus, PP_minus, S, Z, nout=11)
             #[xx_minus, PP_minus, Pe, e, L, S, xhat, Phat, xhat_full, Phat_full, Z] = self.kalman_filter(y, x, P, A, H, Q, R, L, xhat, Phat, xhat_full, Phat_full, xx_minus, PP_minus, S, Z)
             # Filtered state sequence
             fSt[1:T, :] = S[1:T, :]
+            print(':: ACTIVITY: [%d] Applying Kalman smooter' % it)
             [xs_t, xshat, Pshat, xshat_full, Pshat_full, U_t, S_MtT] = self.engine.feval("kmindconnect.kalman_filter.kalman_smoother.m", T, A, S, xhat, Phat, xhat_full, Phat_full, xshat, Pshat, PP_minus, xx_minus, Jt, Z, nout=7)
             # Smoothed state sequence
             sSt = S_MtT[:T,:]
+            print(':: ACTIVITY: [%d] Calculate cross variance' % it)
             #P_ttm1T = self.engine.feval("kmindconnect.kalman_filter.get_cross_variance_terms.m", A, T, M, Phat, Jt, P_ttm1T)
             P_ttm1T = self.get_cross_variance_terms(A, T, M, Phat, Jt, P_ttm1T)
             #P_ttm1T_full = self.engine.feval("kmindconnect.kalman_filter.cross_collapse_cross_variance.m", T, M, d_state, U_t, xshat, xs_t, S_MtT, P_ttm1T)
             P_ttm1T_full = self.cross_collapse_cross_variance(T, M, d_state, U_t, xshat, xs_t, S_MtT, P_ttm1T)
+            print(':: ACTIVITY: [%d] Calculate log-likelihood' % it)
             #LL[it] = self.engine.feval("kmindconnect.kalman_filter.log_likelihood.m", T, Pe, e, S, Z)
             LL[it] = self.log_likelihood(T, Pe, e, S, Z)
             DeltaL = np.abs((LL[it]-OldL)/LL[it]) # Stoping Criterion (Relative Improvement)
             if DeltaL < eps:
                 break
             OldL = LL[it]
+            print(':: ACTIVITY: [%d] Parameter optimization E-phase' % it)
             #[S_t, S_ttm1] = self.engine.feval("kmindconnect.kalman_filter.estimation_step.m", d_state, T, Pshat_full, P_ttm1T_full, xshat_full, nout=2)
             S_t, S_ttm1 = self.estimation_step(d_state, T, Pshat_full, P_ttm1T_full, xshat_full)
+            print(':: ACTIVITY: [%d] Parameter optimization M-phase'%it)
             #[Q, R] = self.engine.feval("kmindconnect.kalman_filter.maximization_step.m", p, M, d_state, A, Q, H, R, y, S_MtT, S_ttm1, S_t, xshat_full, nout=2)
             Q, R = self.maximization_step(p, M, d_state, A, Q, H, R, y, S_MtT, S_ttm1, S_t, xshat_full)
 

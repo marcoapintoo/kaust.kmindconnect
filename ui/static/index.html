@@ -41,9 +41,18 @@
     <link rel="import" href="./components/main_svar_batch_settings.vue">
     <link rel="import" href="./components/main_svar_batch_results.vue">
     <link rel="import" href="./components/main_svar_settings.vue">
+    <link rel="import" href="./components/main_svar_results.vue">
 
     <link rel="import" href="./components/main_svar_data_doc.vue">
     <link rel="import" href="./components/main_svar_model_doc.vue">
+
+    <link rel="import" href="./components/main_svar_execution.vue">
+
+    <link rel="import" href="./components/main_global_settings.vue">
+    <link rel="import" href="./components/main_about.vue">
+    
+    <link rel="import" href="./components/viframes.vue">
+
 </head>
 
 <body>
@@ -64,7 +73,7 @@
     Click me!</i-button>
 <Modal v-model="visible" title="Welcome">Welcome to iView</Modal>
 -->
-                <router-view></router-view>
+                <router-view ref="routerView"></router-view>
             <!--
 
             sss
@@ -87,27 +96,34 @@
         </app-layout>
 
     </div>
-    <template id="foo">
+
+    <template id="svar-single-log" name="svar-single-log">
         <div>
-            aaa
+            <app-svar-execution ref="svarSingleLog"></app-svar-execution>
         </div>
     </template>
 
-    <template id="bar">
-        <markdown-element>
-            # Documentation ## Blah! ### Blah! Esse é outro Documentation! $x^2$ ![https://image.slidesharecdn.com/vuejspresentation-170120140736/95/vuejs-for-angular-developers-26-638.jpg?cb=1484921395](https://image.slidesharecdn.com/vuejspresentation-170120140736/95/vuejs-for-angular-developers-26-638.jpg?cb=1484921395)
-        </markdown-element>
-    </template>
-
-    <template id="assss">
+    <template id="svar-batch-log" name="svar-batch-log">
         <div>
-        <app-svar-settings >
-
-        </app-svar-settings>
+            <app-svar-execution ref="svarBatchLog"></app-svar-execution>
         </div>
     </template>
 
     <script>
+        var appArguments = {
+            dirname: '',
+        }
+        try {
+            appArguments = JSON.parse(decodeURI(window.location.search.substring(1)))
+            appArguments.dirname += "/"
+        } catch (error) {}
+        Object.defineProperty(appArguments, "pureDirName", {
+                get: () => {
+                // returns a dirname cleaned for macosx purposes
+                return appArguments.dirname.replace('Resources/app.asar/', '')
+            }
+        })
+        
         function callAJAX(url, methodType) {
             methodType = methodType || "GET";
             var promiseObj = new Promise(function (resolve, reject) {
@@ -163,11 +179,8 @@
                 const electron = require("electron").remote
                 try {
                     const process = electron.require('child_process');
-                    var ls = process.spawn(commandName, args, {}, (error, stdout, stderr) => {
-                        if (error) {
-                            throw error;
-                        }
-                        console.log(stdout);
+                    console.log(electron.getGlobal('process').env.PATH)
+                    var ls = process.spawn(commandName, args, {
                     }).on('close', function (code) {
                         finish(code)
                     }).on('error', function (err) {
@@ -227,37 +240,343 @@
             get pythonPath(){ return this.settings.pythonPath; }
         }
         
-        const Foo = { name:'foo', template: '#foo' }
-        const Bar = { name:'bar', template: '#bar' }
+        const SingleLog = {name: 'batch-log', template: '#svar-single-log', ref: 'svarBatchLog'}
+        const BatchLog = {name: 'single-log', template: '#svar-batch-log', ref: 'svarSingleLog'}
         const router = new VueRouter({
             routes: [
-                { path: '/foo', component: Foo },
-                { path: '/svar/data/documentati3on', component: {name: "aa", template: "#assss", 
-                        methods: {
-                            show: function () {
-                                this.visible = true;
-                                console.log("aaaa")
-                            },
-                            simulationStart: function (type, parameters) {
-                                console.log(type, parameters)
-                            },
-                }}},
                 { path: '/svar/data/documentation', component: ApplicationSVARDataDocumentation},
                 { path: '/svar/model/documentation', component: ApplicationSVARModelDocumentation },
                 { path: '/svar/single/settings', component: ApplicationSVARSingleSettings },
                 { path: '/svar/single/results', component: ApplicationSVARSingleResults },
+                { path: '/svar/single/log', component: ApplicationSVARExecution , props: { logname: 'svarSingleLog', type: "single" } },
                 { path: '/svar/batch/settings', component: ApplicationSVARBatchSettings },
                 { path: '/svar/batch/results', component: ApplicationSVARBatchResults },
+                { path: '/svar/batch/log', component: ApplicationSVARExecution, props: { logname: 'svarBatchLog', type: "batch" } },
+                { path: '/global/settings', component: ApplicationGlobalSettings },
+                { path: '/about', component: ApplicationAbout },
             ]
         })
+
+        
+        class SVARProcessing{
+            constructor(app){
+                this.app = app
+                this.defaults = {
+                    globalSettings: {
+                        path_script_python: appArguments.pureDirName +'/model/python/kmindconnect.py',
+                        path_script_octave: appArguments.pureDirName + '/model/matlab/algorithm',
+                        path_python: 'python',
+                        path_octave: 'octave',
+                        path_output: appArguments.pureDirName + '/output',
+                        matlab_engine: true,
+                    },
+                    simSettings: {
+                        tvvar_model_order: 1,
+                        tvvar_window_shift: 1,
+                        tvvar_window_width: 100,
+                        cluster_number: 3,
+                        em_iterations: 5,
+                        em_tolerance_error: 1e-10,
+                        surface_pattern: '',
+                        surface_roi_names: '',
+                        input_paths: [],
+                        input_path: '',
+                        matlab_field_name: 'mean_roi',
+                        hashCode: 'NPA6GpUwN8IYIg==',
+                    },
+                }
+                this.singleSettings = {}
+                this.batchSettings = {}
+                this.globalSettings = {}
+                this.commandUpdates = {
+                    single: {output: [], events: [] },
+                    batch: {output: [], events: [] },
+                }
+                this.resetValues()
+                this._sender = null
+            }
+            _resetField(val, defaults){
+                let keys = Object.keys(defaults)
+                for (let i = 0; i < keys.length; i++) {
+                    val[keys[i]] = defaults[keys[i]]
+                }
+            }
+            resetValues(){
+                this.resetSingleValues()
+                this.resetBatchValues()
+                this.resetGlobalValues()
+            }
+            resetGlobalValues() {
+                this._resetField(this.globalSettings, this.defaults.globalSettings)
+            }
+            resetSingleValues() {
+                this._resetField(this.singleSettings, this.defaults.simSettings)
+            }
+            resetBatchValues() {
+                this._resetField(this.batchSettings, this.defaults.simSettings)
+                this.batchSettings.input_paths = []
+            }
+            toCommandLineArgs(data, additionalArguments) {
+                var mapping =  {
+                    "tvvar-model-order": "var-order",
+                    "tvvar-window-shift": "window-shift",
+                    "tvvar-window-width": "window-length",
+                    "cluster-number": "number-states",
+                    "em-iterations": "em-max-iterations",
+                    "em-tolerance-error": "em-tolerance",
+                    "surface-pattern": "brain-surface",
+                    "surface-roi-names": "labels",
+                    "path-script-octave": "matlab-model-path",
+                    //"input-paths": "",
+                    //"input-path": "",
+                    "matlab-field-name": "matlab-field",
+                    "path-output": "output-dir",
+                    "matlab-engine": "use-octave-engine",
+                }
+                //var additionalArguments = Array.prototype.slice.call(arguments);
+                additionalArguments = additionalArguments || []
+                var commandArgs = []
+                var addCommands = (data, isMember) => {
+                    for (let key_ in data) {
+                        var key = key_.replace(/_/g, '-')
+                        var paramName = mapping[key]
+                        if(!paramName && !key.startsWith("input-path")) continue
+                        var value = JSON.stringify(isMember ? this[key_] : data[key_])
+                        if (key == "matlab-engine") {
+                            if (value) commandArgs.push(`--${paramName}=true`)
+                        } else if (!key.startsWith("input-path")) {
+                            commandArgs.push(`--${paramName}=${value}`)
+                        }
+                    }
+                }
+                addCommands(data)
+                for (let i = 0; i < additionalArguments.length; i++) {
+                    const element = additionalArguments[i];
+                    addCommands(element)
+                }
+                if(data['input_paths'] && data['input_paths'].length != 0 ){
+                    for (let i = 0; i < data['input_paths'].length; i++) {
+                        commandArgs.push(data['input_paths'][i])
+                    }
+                }else if(data['input_path'] && data['input_path'] != "" ){
+                    commandArgs.push(data['input_path'])
+                }
+                return commandArgs//.join(" ")
+            }
+            grab_events (log, parameters, data) {
+                let exectime = performance.now();
+                let difftime = Math.round((exectime - this.timestamp.start) * 1e-3, 2);
+                this.timestamp.current = exectime
+                difftime = "" + difftime + " secs"
+                let lines = data.split("\n")
+                for (let i = 0; i < lines.length; i++) {
+                    const line = lines[i].trim();
+                    this._grab_event(log, line, difftime, ":: ERROR:", "error")
+                    this._grab_event(log, line, difftime, ":: ACTIVITY:", "activity")
+                    this._grab_event(log, line, difftime, ":: STATUS:", "status")
+                    this._grab_event(log, line, difftime, ":: START:", "start")
+                    this._grab_event(log, line, difftime, ":: FINISH:", "finish")
+                    var id = this._grab_event(log, line, difftime, ":: EXPERIMENT-ID:", "experiment id")
+                    if(id){
+                        parameters.hashCode = id
+                    }
+                }
+            }
+            _grab_event (log, data, difftime, label, meaning) {
+                //console.log(label, data.startsWith(label))
+                let content = data.replace(label, "").trim()
+                if (data.startsWith(label)) {
+                    log.events.push({ id: log.events.length, shortlabel: meaning.toLowerCase(), type: content, content: `${meaning.toUpperCase()=='ERROR'? 'ERROR ': ''}at ${difftime}.` })
+                    return content
+                }
+            }
+            stdout(log, parameters, data) {
+                data = data.toString()
+                console.log('stdout: <' + data + '> \n');
+                log.output.push({id: log.output.length, type: "stdout", content: data})
+                this.grab_events(log, parameters, data)
+            }
+            stderr(log, parameters, data) {
+                data = data.toString()
+                console.log('stdout: <' + data + '> \n');
+                log.output.push({ id: log.output.length, type: "stderr", content: data})
+                this.grab_events(log, parameters, data)
+            }
+            finish(log, parameters, code) {
+                log.output.push({ id: log.output.length, type: "stdout", content: "[[FINISHED]]"})
+                console.log('finishing: <' + code + '> \n');
+                this._sender.$emit('execution-finished', 'OK', { message: `Exit code: ${code}` })
+                this.app.$Notice.info({
+                    title: 'Execution',
+                    desc: `Model estimation finalized!`
+                });
+            }
+            runBrowser(log, parameters, data) {
+                console.log('browser: <' + data + '> \n');
+                this._sender.$emit('execution-finished', 'FAILED', { message: 'This function is disable on Browser-testing.' })
+            }
+            runStandalone(log, parameters, data) {
+                console.log('app: <' + data + '> \n');
+            }
+            error(log, parameters, data) {
+                log.output.push({ id: log.output.length,  type: "stderr", content: data })
+                console.log('error: <' + data + '> \n');
+            }
+            exe2cute(sender, exectype){
+                if (exectype == "single") {
+                    this.app.$router.push("/svar/single/log")
+                }else if (exectype == "batch") {
+                    this.app.$router.push("/svar/batch/log")
+                }
+                exectype = exectype.toLowerCase()
+                this._sender = sender
+                let self = this
+                let settings = exectype == 'single' ? this.singleSettings : this.batchSettings
+                let log = exectype == 'single' ? this.commandUpdates.single: this.commandUpdates.batch;
+                log.events = []
+                log.output = []
+                let parameters = self.toCommandLineArgs(settings, [this.globalSettings])
+                //if(exectype != 'single')
+                parameters.splice(0, 0, this.globalSettings.path_script_python)
+                parameters.splice(0, 0, '-u')
+                console.log(parameters)
+                //console.log([
+                this.timestamp = { start: performance.now(), current: performance.now() }
+                executeCommand(
+                    this.app.model.globalSettings.path_python,
+                    parameters,
+                    {
+                        stdout: (a,b,c,d) => self.stdout(log, settings, a, b, c, d),
+                        stderr: (a, b, c, d) => self.stderr(log, settings, a, b, c, d),
+                        finish: (a, b, c, d) => self.finish(log, settings, a, b, c, d),
+                        runBrowser: (a, b, c, d) => self.runBrowser(log, settings, a, b, c, d),
+                        runStandalone: (a, b, c, d) => self.runStandalone(log, settings, a, b, c, d),
+                        error: (a, b, c, d) => self.error(log, settings, a, b, c, d),
+                    }
+                )
+                //])
+            }
+
+            execut2e(sender, exectype) {
+                if (exectype == "single") {
+                    this.app.$router.push("/svar/single/log")
+                } else if (exectype == "batch") {
+                    this.app.$router.push("/svar/batch/log")
+                }
+                exectype = exectype.toLowerCase()
+                this._sender = sender
+                let self = this
+                let settings = exectype == 'single' ? this.singleSettings : this.batchSettings
+                let log = exectype == 'single' ? this.commandUpdates.single : this.commandUpdates.batch;
+                log.events = []
+                log.output = []
+                let parameters = self.toCommandLineArgs(settings, [this.globalSettings])
+                //if(exectype != 'single')
+                parameters.splice(0, 0, this.globalSettings.path_script_python)
+                parameters.splice(0, 0, '-u')
+                console.log(parameters)
+                //console.log([
+                this.timestamp = { start: performance.now(), current: performance.now() }
+                executeCommand(
+                    this.app.model.globalSettings.path_python,
+                    parameters,
+                    {
+                        stdout: (a, b, c, d) => self.stdout(log, settings, a, b, c, d),
+                        stderr: (a, b, c, d) => self.stderr(log, settings, a, b, c, d),
+                        finish: (a, b, c, d) => self.finish(log, settings, a, b, c, d),
+                        runBrowser: (a, b, c, d) => self.runBrowser(log, settings, a, b, c, d),
+                        runStandalone: (a, b, c, d) => self.runStandalone(log, settings, a, b, c, d),
+                        error: (a, b, c, d) => self.error(log, settings, a, b, c, d),
+                    }
+                )
+                //])
+            }
+            _execute(log, ownSettings, atEnd){
+                atEnd = atEnd || (() => {})
+                let parameters = this.toCommandLineArgs(ownSettings, [this.globalSettings])
+                //if(exectype != 'single')
+                parameters.splice(0, 0, this.globalSettings.path_script_python)
+                parameters.splice(0, 0, '-u')
+                console.log(parameters)
+                //console.log([
+                this.timestamp = { start: performance.now(), current: performance.now() }
+                //return
+                executeCommand(
+                    this.app.model.globalSettings.path_python,
+                    parameters,
+                    {
+                        stdout: (args) => this.stdout(log, ownSettings, args),
+                        stderr: (args) => this.stderr(log, ownSettings, args),
+                        finish: (args) => { this.finish(log, ownSettings, args); atEnd()},
+                        runBrowser: (args) => this.runBrowser(log, ownSettings, args),
+                        runStandalone: (args) => this.runStandalone(log, ownSettings, args),
+                        error: (args) => this.error(log, ownSettings, args),
+                    }
+                )
+            }
+            execute(sender, exectype) {
+                this._sender = sender
+                if (exectype == "single") {
+                    this.executeInSingle()
+                } else {
+                    this.executeInBatch()
+                }
+            }
+            executeInSingle() {
+                this.app.$router.push("/svar/single/log")
+                let self = this
+                const settings = this.singleSettings
+                let log = this.commandUpdates.single;
+                log.events = []
+                log.output = []
+                this._execute(log, settings)
+            }
+            executeInBatch() {
+                this.app.$router.push("/svar/batch/log")
+                let self = this
+                const settings = this.batchSettings
+                let log = this.commandUpdates.batch;
+                log.events = []
+                log.output = []
+                let loadParam = (index) => {
+                    let ownSettings = Object.assign({}, settings);
+                    ownSettings["input_path"] = settings["input_paths"][index]["input_path"]
+                    ownSettings["matlab_field_name"] = settings["input_paths"][index]["matlab_field_name"]
+                    ownSettings["input_paths"] = []
+                    this._execute(log, ownSettings, () => {
+                        if(index == settings["input_paths"].length - 1)
+                            return
+                        loadParam(index + 1)
+                    })
+
+                }
+                loadParam(0)
+            }
+        }
+
+        var svarstate = new SVARProcessing(null)
 
         Vue.use(VueRouter)
         var app = new Vue({
             el: '#app',
             data: {
                 visible: false,
+                model: {
+                    svarSingleLog: null,
+                    svarBatchLog: null,
+                    globalSettings: {
+                        path_python: 'python',
+                        path_octave: 'octave',
+                        path_output: './output',
+                        matlab_engine: true,
+                    },
+                },
             },
             created: function () {
+                svarstate.app = this
+                this.model = svarstate
+
+                this.$on('update-global-settings', this.updateGlobalSettings);
                 this.$on('execution-start', this.simulationStart);
             },
             methods: {
@@ -265,10 +584,19 @@
                     this.visible = true;
                     console.log("aaaa")
                 },
-                simulationStart: function (sender, type, parameters) {
-                    console.log(type, parameters)
+                updateGlobalSettings: function(settings) {
+                    this.model.globalSettings = settings
+                },
+                simulationStart: function (sender, modeltype, parameters) {
+                    console.log(modeltype, parameters)
+                    console.log(this)
+                    console.log(this.model)
+                    console.log(this.$refs)
+                    console.log(this.$refs.svarSingleLog)
+                    var executor = new SVARProcessing(this, parameters)
+                    executor.execute()
                     executeCommand(
-                        "pyth1on", 
+                        "python", 
                         ["-m", "this"],
                         {
                             stdout(data) {
