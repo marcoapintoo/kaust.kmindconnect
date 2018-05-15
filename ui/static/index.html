@@ -53,6 +53,11 @@
     
     <link rel="import" href="./components/viframes.vue">
 
+
+    <script src="https://unpkg.com/chart.js@2.7.1/dist/Chart.bundle.js"></script>
+    <script src="https://unpkg.com/chartkick@2.3.3"></script>
+    <script src="https://unpkg.com/vue-chartkick@0.2.1/dist/vue-chartkick.js"></script>
+
 </head>
 
 <body>
@@ -120,7 +125,9 @@
         Object.defineProperty(appArguments, "pureDirName", {
                 get: () => {
                 // returns a dirname cleaned for macosx purposes
-                return appArguments.dirname.replace('Resources/app.asar/', '')
+                if(appArguments.dirname.indexOf('Resources/app.asar') > 0)
+                    return appArguments.dirname.replace('Resources/app.asar/', '')
+                return appArguments.dirname == ""? ".": appArguments.dirname
             }
         })
         
@@ -267,7 +274,7 @@
                         path_script_octave: appArguments.pureDirName + '/model/matlab/algorithm',
                         path_python: 'python',
                         path_octave: 'octave',
-                        path_output: appArguments.pureDirName + '/output',
+                        path_output: appArguments.pureDirName.replace(/\w+.app[\/\\]Contents/, "") + '/output',
                         matlab_engine: true,
                     },
                     simSettings: {
@@ -282,7 +289,8 @@
                         input_paths: [],
                         input_path: '',
                         matlab_field_name: 'mean_roi',
-                        hashCode: 'NPA6GpUwN8IYIg==',
+                        //hashCode: 'NPA6GpUwN8IYIg==',
+                        hashCode: 'XGPg1f3TsQLswQ==',
                     },
                 }
                 this.singleSettings = {}
@@ -677,12 +685,13 @@
             //i18n: 
         })
 
-        document.addEventListener("keydown", function (e) {
-            if (e.which === 123) {
-                require('remote').getCurrentWindow().toggleDevTools();
-            } else if (e.which === 116) {
+        document.addEventListener("keypress", function (e) {
+            if(e.ctrlKey && e.keyCode == 8 || e.ctrlKey && e.key == 't'){
+                require("electron").remote.getCurrentWindow().toggleDevTools();
+            } else if (e.ctrlKey && e.key == "r") {
                 location.reload();
             }
+            console.log(e, "###")
         });
     </script>
 </body>

@@ -1,0 +1,16 @@
+CG.L
+PP.L
+PT.L
+PoCG.L
+PreCG.L
+STG.L
+TTG.L
+TTS.L
+CG.R
+PP.R
+PT.R
+PoCG.R
+PreCG.R
+STG.R
+TTG.R
+TTS.R'

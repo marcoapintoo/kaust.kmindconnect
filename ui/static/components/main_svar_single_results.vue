@@ -3,6 +3,7 @@
         <iview-tabs type="card" :animated="false">
             <iview-tab-pane label="Visual results" class="no-scroll">
                 <app-svar-results
+                    ref="results"
                     :outputPath="modelGlobal.path_output"
                     :hashCode="modelGraph.hashCode"
                     :states="modelGraph.cluster_number"

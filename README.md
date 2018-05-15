@@ -1,6 +1,18 @@
 
 # My project's README
 
+
+sudo apt install octave octave-signal octave-statistics
+
+pip install oct2py 
+conda install plotly
+conda install docopt
+
+
+Install node
+sudo npm install -g electron --unsafe-perm=true --allow-root
+
+
 # License
 
 Licensed under either

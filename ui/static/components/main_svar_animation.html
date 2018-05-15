@@ -1,0 +1,523 @@
+<!doctype html>
+<html>
+
+<head>
+    <!-- Load c3.css -->
+    <link href="../css/c3.min.css" rel="stylesheet">
+    <link href="../css/photon.css" rel="stylesheet">
+
+    <style type="text/css">
+        #particle-canvas>div {
+            display: none !important;
+        }
+
+        #particle-canvas>* {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        body #background {
+            position: absolute!important;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 0;
+            /*background: linear-gradient(231deg, rgb(130, 162, 191) 0%, rgb(130, 164, 191) 1%, rgb(19, 35, 54) 100%);
+            */
+        }
+
+
+        body {
+            /*background-color: #f5f5f4;*/
+            /*font-family: Verdana, Geneva, Tahoma, sans-serif;
+            background-color: rgb(19, 35, 54);*/
+            overflow: hidden;
+        }
+
+        #chart {
+            height: 30%;
+            width: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            overflow: hidden;
+        }
+
+        #brain-diagram {
+            text-align: center;
+            position: absolute;
+            top: 30%;
+            left: 0;
+            width: 100%;
+            height: 40%;
+            overflow: hidden;
+        }
+
+        #brain-diagram span img {
+            margin: auto;
+            display: none;
+            height: 100%;
+        }
+
+        #brain-diagram span img.enabled {
+            display: block;
+        }
+
+        #brain-states {
+            text-align: center;
+            position: absolute;
+            top: 67%;
+            left: 0;
+
+            height: 30%;
+            overflow-x: scroll;
+            overflow-y: hidden;
+            display: flex;
+            width: 100%;
+        }
+
+        #brain-states span iframe {
+            margin: auto;
+            height: 100%;
+            border: none;
+            padding: 10px;
+        }
+
+        #brain-states iframe.brain-states {
+            margin: auto;
+            m3argin-left: -15%;
+            m3argin-top: -8%;
+            width: 100%;
+            zoom: 0.20;
+            height: 80%;
+            overflow: hidden;
+            border-radius: 5px;
+            border: white solid 1px;
+            margin-top: 10px;
+        }
+
+        #brain-states .brain-states-container {
+            height: 95%;
+            display: inline-block;
+            margin: 4px;
+            /*overflow: hidden;*/
+            opacity: 0.5;
+            min-width: 250px;
+        }
+
+
+        #brain-states iframe.brain-states.enabled {}
+
+        #brain-states .brain-states-container.enabled {
+            opacity: 1;
+        }
+
+        #brain-states .brain-states-container span {
+            height: 12px;
+            font-size: 12px;
+            color: black;
+        }
+
+        #brain-diagram-legend {
+            text-align: center;
+            position: absolute;
+            top: 34%;
+            left: 78%;
+            width: 16%;
+        }
+        .frame{
+            box-shadow: 0 0 30px rgba(0,0,0,.1);
+            border-radius: 5px;
+            border: 1px solid #bebebe;
+            display: inline-table;
+            background: #f5f5f4;
+            overflow: hidden;
+            position: initial;
+        }
+
+        #brain-diagram-legend img {
+            width: 100%;
+            padding: 3px;
+        }
+
+        #brain-diagram-description .subtitle {
+            font-size: 12pt;
+        }
+
+        #brain-diagram-description {
+            font-family: system, -apple-system, ".SFNSDisplay-Regular", "Helvetica Neue", Helvetica, "Segoe UI";
+            font-size: 14pt;
+            font-weight: normal;
+            text-align: justify;
+            position: absolute;
+            top: 45%;
+            left: 8%;
+            width: 16%;
+            color: rgba(0, 0, 0, 0.8);
+        }
+
+        #particle-canvas {
+            position: absolute!important;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 1;
+            opacity: 0.5;
+        }
+
+        body>* {
+            z-index: 10;
+        }
+
+        /*#chart{
+      padding: 5px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 5px;
+     }*/
+
+        path.c3-line {
+            stroke: white!important;
+        }
+
+        path.domain,
+        .tick line {
+            stroke: rgba(0, 0, 0, 0.4);
+        }
+
+        .c3-axis-y * {
+            display: none;
+        }
+
+        .c3-axis-x .tick line {
+            stroke: rgba(0, 0, 0, 0.1);
+        }
+
+        text,
+        tspan {
+            fill: rgba(0, 0, 0, 0.6);
+        }
+
+        .tick text tspan {
+            fill: rgba(0, 0, 0, 0.4);
+        }
+
+        ::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            border-radius: 5px;
+            background-color: #989698;
+            box-shadow: 0 0 1px rgba(255, 255, 255, .5);
+        }
+
+        .speed{
+            -webkit-appearance: button;
+        }
+
+.speed.btn-dropdown:after {
+  font-family: "photon-entypo";
+  margin-left: 5px;
+  content: '\e873'!important;
+}
+.btn.disabled{
+    display: none;
+}
+    </style>
+</head>
+
+<body>
+    <div class="window">
+        <div class="toolbar">
+        <div class="toolbar-actions">
+
+        <div class="btn-group">
+            <button class="btn btn-default play">
+            <span class="icon icon-play"></span>
+            &nbsp; Play
+        </button>
+            <button class="btn btn-default stop disabled">
+                <span class="icon icon-pause"></span>
+                &nbsp; Pause
+            </button>
+            <select class="speed btn btn-default btn-dropdown pull-right">
+                <option value="2000"><span class="icon icon-back-in-time"></span>&nbsp;0.1x speed</option>
+                <option value="1000"><span class="icon icon-back-in-time"></span>&nbsp;0.5x speed</option>
+                <option value="500"><span class="icon icon-back-in-time"></span>&nbsp;Normal speed</option>
+                <option value="250"><span class="icon icon-back-in-time"></span>&nbsp;2x speed</option>
+                <option value="100"><span class="icon icon-back-in-time"></span>&nbsp;5x speed</option>
+                <option value="10"><span class="icon icon-back-in-time"></span>&nbsp;10x speed</option>
+            </select>
+        </div>
+        </div>
+        </div>
+    <div id="chart"></div>
+    <div id="brain-diagram"></div>
+    <div id="brain-diagram-description">
+        <div class="subtitle"></div>
+    </div>
+    <div id="brain-diagram-legend" class="window frame">
+        <div class="title toolbar">Regions of Interest</div>
+        <img src="../images/ROIs-no-title.svg" />
+    </div>
+    <div id="brain-states"></div>
+    </div>
+</body>
+<!-- Load d3.js and c3.js -->
+<script src="../js/d3.v3.min.js" charset="utf-8"></script>
+<script src="../js/c3.min.js"></script>
+<script>
+
+    function getUrlParams(defaults) {
+        defaults = defaults || {};
+        let search = window.location.search;
+        let hashes = search.slice(search.indexOf('?') + 1).split('&')
+        let params = {}
+        for (key in defaults) {
+            params[key] = defaults[key];
+        }
+        hashes.map(hash => {
+            let [key, val] = hash.split('=')
+            params[key] = decodeURIComponent(val)
+        })
+
+        return params
+    }
+
+    class StateSequence {
+        constructor() {
+            this.data = {}
+            this.states = null;
+            this.chart = null;
+            this.timeout = 500;
+            this.brainDiagramSelector = null;
+            this.brainStatesSelector = null;
+            this.reduceByOne = true;
+            this.counter_x = -1;
+        }
+        addBrainDiagrams(selector, urlTemplate) {
+            this.brainDiagramSelector = selector;
+            const states = Object.keys(this.data);
+            var html = "";
+            for (let i = 0; i < states.length; i++) {
+                html += '<span><img class="brain-diagram state-' + (i + 1) + '" src="' + urlTemplate.replace("[[state]]", i + 1) + '"/></span>'
+            }
+            document.querySelector(selector).innerHTML = html;
+        }
+        showBrainDiagram(state) {
+            Array.from(document.querySelectorAll(this.brainDiagramSelector + " span img")).forEach((e) => {
+                e.classList.remove("enabled")
+            })
+            document.querySelector(this.brainDiagramSelector + " span img.state-" + state).classList.add("enabled")
+        }
+
+        addBrainStates(selector, urlTemplate) {
+            this.brainStatesSelector = selector;
+            const states = Object.keys(this.data);
+            var html = "";
+            var width = (90.0) / states.length;
+            for (let i = 0; i < states.length; i++) {
+                html += '<div class="brain-states-container window frame" style="width:' + width + '%"><div class="toolbar">State ' + (i + 1) + '</div><iframe sandbox="allow-scripts allow-same-origin" allowtransparency="true" class="brain-states state-' + (i + 1) + '" src="' + urlTemplate.replace("[[state]]", i + 1) + '"></iframe></div>'
+            }
+            document.querySelector(selector).innerHTML = html;
+        }
+
+        showBrainState(state) {
+            Array.from(document.querySelectorAll(this.brainStatesSelector + " div iframe")).forEach((e) => {
+                e.classList.remove("enabled")
+                e.parentElement.classList.remove("enabled")
+            })
+            document.querySelector(this.brainStatesSelector + " div iframe.state-" + state).classList.add("enabled")
+            document.querySelector(this.brainStatesSelector + " div iframe.state-" + state).parentElement.classList.add("enabled")
+        }
+
+        loadData(states) {
+            this.states = states;
+            for (let i = 0; i < states.length; i++) {
+                let state = states[i];
+                if (!this.reduceByOne) {
+                    state--;
+                }
+                const stateName = "State " + (state + 1);
+                if (this.data[stateName] === undefined) {
+                    this.data[stateName] = new Int16Array(states.length);
+                }
+                this.data[stateName][i] = state + 1;
+            }
+        }
+        createTimer() {
+            this.enableTimer = true;
+            var counter = () => {
+                this.counter_x  = (this.counter_x + 1) % this.states.length;
+                this.chart.tooltip.show({ x: this.counter_x })
+                if(this.enableTimer)
+                    setTimeout(counter, this.timeout);
+            };
+            setTimeout(counter, this.timeout);
+        }
+        stopTimer(){
+            this.enableTimer = false;
+        }
+        createChart(id) {
+            const keys = Object.keys(this.data);
+            var types = {}
+            var data = [];
+            for (let i = 0; i < keys.length; i++) {
+                var columnData;
+                types[keys[i]] = "area-step";
+                data.push([keys[i]])
+                Array.prototype.push.apply(data[i], this.data[keys[i]])
+            }
+            console.log(types)
+            console.log(data)
+            var self = this;
+            this.chart = c3.generate({
+                bindto: id,
+                data: {
+                    columns: data,
+                    types: types
+                },
+                tooltip: {
+                    format: {
+                        title: function (d) { return 'Instant: ' + d; },
+                        value: function (value, ratio, id) {
+                            var format = id === 'data1' ? d3.format(',') : d3.format('$');
+                            return format(value);
+                        },
+                        name: function (name, ratio, id, index) { return "aa" + name; },
+
+                    },
+                    contents: function (d, defaultTitleFormat, defaultValueFormat, color) {
+                        var selected = null;
+                        var selectedValue = null;
+                        for (let i = 0; i < d.length; i++) {
+                            const element = d[i];
+                            if (d[i].value > 0) {
+                                selected = d[i].id;
+                                selectedValue = d[i].value;
+                                break;
+                            }
+                        }
+                        self.showBrainDiagram(selectedValue)
+                        self.showBrainState(selectedValue)
+                        window.ar = [d, defaultTitleFormat, defaultValueFormat, color]
+                        //return "a"
+                        var content = '<div class="c3-tooltip-container">' +
+                            '<table class="c3-tooltip"><tbody>' +
+                            '<tr><th colspan="2">Instant: ' +
+                            '</th></tr><tr class="c3-tooltip-name"><td class="name"><span style="background-color:' + color(selected) + '"></span>' +
+                            selected + '</td></tr></tbody></table></div>';
+
+                        var content = '<div class="c3-tooltip-container">' +
+                            '<table class="c3-tooltip"><tbody>' +
+                            '<tr class="c3-tooltip-name"><td class="name"><span style="background-color:' + color(selected) + '"></span>' +
+                            selected + '</td></tr></tbody></table></div>';
+                        return content;
+                    }
+                }
+            });
+        }
+    }
+    //let codename = 6791;
+    //
+    //let codename = 6550;
+    //let codename = 6492;
+    ////let codename = 6389;
+    //
+    let output_path = decodeURI(getUrlParams({ path: "../../python/graphical-outputs/results-6251_mean_fs" }).path)
+    console.log(output_path)
+    document.addEventListener("DOMContentLoaded", () => {
+        let xobj = new XMLHttpRequest();
+        let stateSequence = new StateSequence();
+        //stateSequence.loadData([1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 0, 0, 1, 2, 3, 2, 1, 0]);
+        stateSequence.timeout = 50;
+
+        xobj.overrideMimeType("application/json");
+        xobj.open('GET', `${output_path}/kalman_states_smoothed.json`, true);
+        // Replace 'my_data' with the path to your file
+        xobj.onreadystatechange = () => {
+            if (xobj.readyState == 4 && xobj.status == "200") {
+                var data = JSON.parse(xobj.responseText)[0];
+                stateSequence.reduceByOne = false;
+                stateSequence.loadData(data);
+                stateSequence.createChart("#chart")
+                //stateSequence.addBrainDiagrams("#brain-diagram", "/Users/pinto.marco/KAUSTProjects/TonitruumUI0/kEEGConnect/python/outputs3/results-6791_mean_fs/coherence_state_[[state]].svg");
+                //stateSequence.addBrainStates("#brain-states", "/Users/pinto.marco/KAUSTProjects/TonitruumUI0/kEEGConnect/python/outputs3/results-6791_mean_fs/kalman_estimated_coherence-state-[[state]].html");
+                stateSequence.addBrainDiagrams("#brain-diagram", `${output_path}/coherence_state_[[state]].svg`);
+                stateSequence.addBrainStates("#brain-states", `${output_path}/kalman_estimated_coherence-state-no-margin-[[state]].html`);
+                /////
+                
+                window.stateSequence = stateSequence
+            }
+        };
+        xobj.send(null);
+
+        document.querySelector(".btn.play").addEventListener("click", (e) => {
+            console.log(document.querySelector(".btn.play"))
+            console.log(document.querySelector(".btn.stop"))
+            document.querySelector(".btn.play").classList.add("disabled")
+            document.querySelector(".btn.stop").classList.remove("disabled")
+            stateSequence.createTimer()
+        })
+        
+        document.querySelector(".btn.stop").addEventListener("click", (e) => {
+            console.log(document.querySelector(".btn.play"))
+            console.log(document.querySelector(".btn.stop"))
+            document.querySelector(".btn.stop").classList.add("disabled")
+            document.querySelector(".btn.play").classList.remove("disabled")
+            stateSequence.stopTimer()
+        })
+
+        document.querySelector(".btn.speed").value = 500;
+        
+        document.querySelector(".btn.speed").addEventListener("change", (e) => {
+            console.log(document.querySelector(".btn.speed"))
+            console.log(document.querySelector(".btn.speed").value)
+            stateSequence.timeout = Number.parseFloat(document.querySelector(".btn.speed").value)
+        })
+
+    })
+  /*var chart = c3.generate({
+    bindto: '#chart',
+    data: {
+      columns: [
+        ['data1', 300, 350, 300, 0, 0, 100],
+        ['data2', 130, 100, 140, 200, 150, 50]
+      ],
+      types: {
+        data1: 'area-step',
+        data2: 'area-step'
+      }
+    }
+  });*/
+</script>
+<!--
+<script type="text/javascript" src="../../presentation/particles/particle-network.min.js"></script>
+<script>
+
+    if ("ontouchstart" in document.documentElement) {
+        document.querySelector(".hint").innerHTML = "<p>Tap on the left or right to navigate</p>";
+    }
+
+    var canvasDiv = document.getElementById('particle-canvas');
+    var options = {
+        particleColor: '#fff',
+        interactive: false,
+        speed: 'low',
+        density: 'medium',
+        speed: 'slow'
+    };
+    var particleCanvas = new ParticleNetwork(canvasDiv, options);
+
+    window.dispatchEvent(new Event('resize'));
+
+</script>
+-->
+
+</html>

@@ -63,7 +63,7 @@ app.on('ready', function () {
   mainWindow.on('closed', function() {
     mainWindow = null;
   });
-  mainWindow.toggleDevTools();
+  //mainWindow.toggleDevTools();
 });
 
 app.on('error', function () {
